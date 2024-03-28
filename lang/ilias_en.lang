@@ -1,0 +1,171 @@
+// 
+// German Language File for CloudStorage Plugin
+//
+<!-- language file start -->
+obj_xcls#:#Cloud Folder
+objs_xcls#:#Cloud Folder
+obj_xcls_duplicate#:#Copy
+objs_xcls_duplicate#:#Copy Cloud Folder
+obj_xcls_select#:#Select Cloud Folder
+service_type_title#:#Cloud Type
+multifs#:#Cloud Folder
+xcls_multifs#:#Cloud Folder
+xcls_add#:#Add Cloud Folder
+xcls_new#:#Add new Cloud Folder
+xcls_read#:#Read access: Read access to Cloud Folder 
+xcls_write#:#Change settings: Edit Cloud Folder
+xcls_copy#:#Copy: Copy Cloud Folder
+xcls_delete#:#Delete: Delete, Move and Link Cloud Folder
+xcls_visible#:#Display: Cloud Folder is visible
+xcls_edit_permission#:#Change Permissions
+xcls_files_visible#:#Cloud Files are visible
+xcls_folders_visible#:#Cloud Subfolders are visible
+xcls_download#:#Download Cloud Files
+xcls_upload#:#Upload Cloud Files
+xcls_folders_create#:#Add Cloud Subfolders
+xcls_delete_files#:#Delete Cloud Files
+xcls_delete_folders#:#Delete Cloud Subfolders
+xcls_edit_in_online_editor#:#Open in external editor
+configure#:#Configuration
+edit#:#Settings
+properties#:#Settings
+edit_properties#:#Edit Settings
+back#:#Back
+Cloudstorage#:#Content
+content#:#Content
+status#:#Status
+offline#:#Offline
+not_available#:#Not available
+no_connection
+no_active_conn#:#No Cloud Service available
+auth_failed#:#Authentication failed
+plugin_migration#:#Migration of Cloud Folders from ILIAS 7
+migrate_old#:#Migrate Cloud Folders from ILIAS 7
+migrate_desc#:#There are still incompatible Cloud Folders from ILIAS 7 in the installation that need to be migrated.
+keep_credentials#:#Transfer OAuth2 client credentials and tokens (please contact your technical support if this is possible)
+migrate_success#:#Migration successful
+fill_new_credentials#:#Please enter the new client credentials and save the Cloud Connection
+delete_old#:#Delete Cloud Folder from ILIAS 7
+col_app#:#Collaboration app integration
+col_app_info#:#Activate the action "Open in external editor", which opens documents directly in a collaboration app (e.g. OnlyOffice).
+col_app_url#:#Relative URL collaboration app
+col_app_url_info#:#The placeholders &#123FILE_ID} and &#123FILE_PATH} can be used. E.g. OnlyOffice: index.php/apps/onlyoffice/&#123FILE_ID}?filePath=&#123FILE_PATH}
+col_app_formats#:#Supported formats
+col_app_formats_info#:#Comma-separated list of formats that can be opened in the app.
+col_app_mapping_field#:#Field for mapping
+col_app_mapping_field_info#:#Determines which field contains the OwnCloud login name (used to grant permissions to documents).
+plugin_configuration#:#Configuration
+config_help_begin#:#The explanation under settings is:
+showcontent#:#Cloud Connection
+title#:#Title
+conf_title#:#Title
+info_title#:#This title is displayed to select the Cloud Service for new Folders.
+conf_availability#:#Availability
+info_availability#:#This is where you define whether and how this Cloud Connection can be used. "Not available" = Cloud Connection and Cloud Folder of this connection not available; "Existing allowed" = existing Cloud Folders of this connection allowed, connection cannot be selected for new Cloud Folders; "New ones can be created" = connection can be selected for new Cloud Folders 
+conf_availability_0#:#Not available
+conf_availability_1#:#Existing allowed
+conf_availability_2#:#New ones can be created
+untrashed_usages#:#Number of usages
+saving_invoked#:#Settings saved
+create_type#:#Define new Cloud Connection
+delete_type#:#Delete Cloud Connection
+delete_conn#:#Delete Cloud Connection?
+conn_deleted#:#The Cloud Connection was deleted.
+delete#:#Delete
+conn_id#:#Cloud Connection
+Overview_uses#:#Overview uses
+references#:#Links
+create_info#:#Connection to the Cloud Service OwnCloud
+Proxy#:#Proxy
+Configuration#:#Settings
+creation_frm_base_directory#:#Base Folder
+creation_frm_base_directory_info#:#With leading /
+Choose_root#:#Please select the desired folder to link below. <br>Note: If there are many files, displaying the folder contents may take some time. The path of the desired folder can also be entered manually in the settings.
+link_choose_root#:#Select Folder
+no_connection#:#A connection to the Cloud Service could not be established. Please check your settings and in all cases contact technical support.
+no_connection_short#:#A connection to the Cloud Service could not be established.
+base_directory#:#Base directory
+base_directory_info#:#This directory is selected as the Base Folder for newly created objects. This is intended to prevent the entire OwnCloud from being integrated into new objects. However, the Base Folder can be customized later.
+hint#:#Hint text
+server_url#:#Server URLproxy_url#:#Proxy URL
+proxy_url_info#:#The proxy URL is inserted from the ILIAS setup settings when a new Cloud Connection is created.
+webdav_url#:#WebDav server URL
+webdav_url_info#:#WebDav server URL if different from the server URL. This is the case, for example, if the Cloud Service is hosted in the same infrastructure and must be accessed via the internal address. Example: http://SERVER_HOST:8080
+webdav_path#:#WebDAV path
+oa2_active#:#OAuth2 authentication
+oa2_active_info#:#Authentication is only required the first time a Cloud Folder is created. A personal token is then used for authentication. No passwords are stored in ILIAS.
+oa2_client_id#:#Client identifier
+oa2_client_secret#:#Secret
+oa2_path#:#OAuth2 path
+oa2_token_request_auth#:#Token request authentication
+oa2_token_request_auth_info#:#Defines how token requests are authenticated (experimental - "Post Body" may be required for NextCloud).
+extended_networking#:#Extended Network Settings
+extended_networking_info#:#Only relevant in certain system configurations. Please contact technical support for more information.
+header#:#Basic (header)
+post_body#:#Post Body
+default_info#:#Default: %s
+info_token_expires#:#Access Token expires
+root_folder#:#Folder
+not_authorized#:#Authentication failed. Please reload the page to be redirected to the authentication authority.
+only_owner#:#Only the person who created the Cloud Folder can currently open it.
+open_in_ownCloud#:#Open in external editor
+cld_add#:#New Cloud Folder
+cld_add_download_failed#:#Download failed
+cld_add_file#:#File
+cld_add_folder#:#Folder
+cld_add_items_from_service_failed#:#Adding an item from the service failed. Please contact technical support.
+cld_add_new_item#:#Add New Item
+cld_auth_failed#:#Authentication failed
+cld_auth_failed_no_object_created#:#Authentication failed. No Cloud Folder was created.
+cld_authentication_failed#:#:#Authentication failed
+cld_config_entry_does_not_exist#:#The configuration value does not exist in the configuration table
+cld_config_no_valid_get_or_set_function#:#Invalid set or get function
+cld_config_table_does_not_exist#:#Configuration table does not exist
+cld_config_unknown_exception#:#Unknown error
+cld_confirm_delete_file#:#Are you sure you want to delete the following file?
+cld_confirm_delete_folder#:#Are you sure you want to delete the following folder?
+cld_create_folder#:#Create Folder
+cld_delete_failed#:#Deletion failed
+cld_edit_Settings#:#Cloud Settings
+cld_file_deleted#:#Object deleted
+cld_file_not_existing_on_service#:#File does not exist in the Cloud:
+cld_folder_already_existing_on_service#:#Folder already exists in the Cloud
+cld_resource_not_existing_or_renamed#:#The folder or file no longer exists in the Cloud or has been renamed. Click on the "Contents" tab.
+cld_root_folder_not_existing_or_renamed#:#The selected folder does not exist in the Cloud Service or has been renamed. Click on the "Settings" tab and select a new folder.
+cld_folder_created#:#Folder created
+cld_folder_creation_failed#:#Creation of the folder has failed
+cld_folder_name#:#Title
+cld_folder_not_existing_on_service#:#Folder does not exist in the Cloud
+cld_id_already_exists_in_file_tree_in_session#:#The Id already exists in the session:
+cld_id_does_not_exist_in_file_tree_in_session#:#The Id does not exist in the session
+cld_info_add_file_to_current_directory#:#Add file to directory
+cld_info_add_folder_to_current_directory#:#Add Folder to directory
+cld_invalid_input#:#Invalid input
+cld_invalid_input_allowed#:#Allowed characters: %s
+cld_new#:#Add new Cloud Folder
+cld_no_service_active#:#Unfortunately, no cloud plugin is activated
+cld_no_service_selected#:#No Cloud Service has been selected.
+cld_not_authenticated_offline#:#Not authenticated - offline
+cld_object_added#:#A new Cloud Folder has been added
+cld_only_owner_has_permission_to_change_root_path#:#Only the person who created the Cloud Folder can change this specification.
+cld_path_does_not_exist_in_file_tree_in_session#:#Path does not exist in the session:
+cld_permission_denied#:#Access denied
+cld_permission_to_change_root_folder_denied#:#Access for changing the base directory was denied.
+cld_plugin_hook_could_not_be_instantiated#:#The plugin hook class could not be instantiated.
+cld_plugin_not_active#:#The plugin for the selected Cloud Service is not active.
+cld_root_folder#:#Folder structure
+cld_service#:#Service
+cld_service_class_file_not_found#:#The service class file was not found.
+cld_service_not_active#:#The selected Cloud Service is not active
+cld_service_specific_settings#:#specific settings
+cld_unknown_exception#:#Unknown error
+cld_upload_failed#:#Download failed
+cld_upload_failed_max_filesize#:#Upload failed. Maximum file size was exceeded
+cld_upload_files#:#File selection
+cld_no_connection#:#Could not establish a connection to the Cloud Service. Please check the settings and contact technical support if necessary.
+cld_not_auth_completed#:#Not yet authenticated
+cld_not_authorized#:#Not authenticated
+info_hint#:#The hint text is displayed in the info tab of the Cloud Folders.
+file_folder_not_visible#:#Permission denied.
+node_is_null#:#Ressource could not be found.
+please_wait#:#Please wait

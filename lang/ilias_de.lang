@@ -1,0 +1,172 @@
+// 
+// German Language File for CloudStorage Plugin
+//
+<!-- language file start -->
+obj_xcls#:#Cloud-Ordner
+objs_xcls#:#Cloud-Ordner
+obj_xcls_duplicate#:#Kopieren
+objs_xcls_duplicate#:#Cloud-Ordner kopieren
+obj_xcls_select#:#Cloud-Ordner auswählen
+service_type_title#:#Cloud-Typ
+multifs#:#Cloud-Ordner
+xcls_multifs#:#Cloud-Ordner
+xcls_add#:#Cloud-Ordner hinzufügen
+xcls_new#:#Neuen Cloud-Ordner hinzufügen
+xcls_read#:#Lesezugriff: Auf Cloud-Ordner lesend zugreifen 
+xcls_write#:#Einstellungen ändern: Cloud-Ordner bearbeiten
+xcls_copy#:#Kopieren: Cloud-Ordner kopieren
+xcls_delete#:#Löschen: Cloud-Ordner löschen, verschieben und verknüpfen
+xcls_visible#:#Anzeigen: Cloud-Ordner ist sichtbar
+xcls_edit_permission#:#Rechteeinstellungen ändern
+xcls_files_visible#:#Cloud-Dateien sind sichtbar
+xcls_folders_visible#:#Cloud-Unterordner sind sichtbar
+xcls_download#:#Cloud-Dateien herunterladen
+xcls_upload#:#Cloud-Dateien hochladen
+xcls_folders_create#:#Cloud-Unterordner hinzufügen
+xcls_delete_files#:#Cloud-Files löschen
+xcls_delete_folders#:#Cloud-Unterordner löschen
+xcls_edit_in_online_editor#:#In externem Editor öffnen
+configure#:#Konfiguration
+edit#:#Einstellungen
+properties#:#Einstellungen
+edit_properties#:#Einstellungen bearbeiten
+back#:#Zurück
+cloudstorage#:#Inhalt
+content#:#Inhalt
+status#:#Status
+offline#:#Offline
+not_available#:#Nicht verfügbar
+no_connection
+no_active_conn#:#Kein Cloud-Service verfügbar
+auth_failed#:#Authentifizierung fehlgeschlagen
+plugin_migration#:#Migration von Cloud-Ordnern aus ILIAS 7
+migrate_old#:#Cloud-Ordner aus ILIAS 7 migrieren
+migrate_desc#:#Es existieren noch inkompatible Cloud-Ordner aus ILIAS 7 in der Installation, die migriert werden müssen.
+keep_credentials#:#OAuth2 Client Credentials und Tokens übernehmen (Btte kontaktieren Sie Ihre technische Betreuung, ob dies möglich ist)
+migrate_success#:#Migration erfolgreich
+fill_new_credentials#:#Bitte tragen Sie die neuen Client-Credentials ein und speichern Sie die Cloud-Anbindung
+delete_old#:#Cloud-Ordner aus ILIAS 7 löschen
+col_app#:#Collaboration-App-Integration
+col_app_info#:#Aktiviert die Aktion "In externem Editor öffnen", welche Dokumente direkt in einer Collaboration App (z.B. OnlyOffice) öffnet.
+col_app_url#:#Relative URL Collaboration-App
+col_app_url_info#:#Als Platzhalter können &#123FILE_ID} und &#123FILE_PATH} verwendet werden. Bsp. OnlyOffice: index.php/apps/onlyoffice/&#123FILE_ID}?filePath=&#123FILE_PATH}
+col_app_formats#:#Unterstützte Formate
+col_app_formats_info#:#Kommaseparierte Liste der Formate, welche in der App geöffnet werden können.
+col_app_mapping_field#:#Feld für Mapping
+col_app_mapping_field_info#:#Bestimmt, in welchem Feld der OwnCloud-Anmeldename enthalten ist (wird verwendet, um Berechtigungen auf Dokumente zu erteilen).
+plugin_configuration#:#Konfiguration
+config_help_begin#:#Die Erläuterung unter Einstellungen lautet:
+showcontent#:#Cloud-Anbindung
+title#:#Titel
+conf_title#:#Titel
+info_title#:#Dieser Titel wird zur Auswahl des Cloud-Services bei neuen Ordnern angezeigt.
+conf_availability#:#Verfügbarkeit
+info_availability#:#Hiermit legen Sie fest, ob und wie diese Cloud-Anbindung genutzt werden kann. "Nicht verfügbar" = Cloud-Anbindung und Cloud-Ordner dieser Anbindung nicht verfügbar; "Bestehende erlaubt" = existierende Cloud-Ordner dieser Anbindung erlaubt, für neue Cloud-Ordner ist Anbindung nicht auswählbar; "Neue erzeugbar" = Anbindung ist für neue Cloud-Ordner auswählbar 
+conf_availability_0#:#Nicht verfügbar
+conf_availability_1#:#Bestehende erlaubt
+conf_availability_2#:#Neue erzeugbar
+untrashed_usages#:#Anzahl Verwendungen
+saving_invoked#:#Einstellungen gespeichert
+create_type#:#Neue Cloud-Anbindung definieren
+delete_type#:#Cloud-Anbindung löschen
+delete_conn#:#Cloud-Anbindung löschen?
+conn_deleted#:#Die Cloud-Anbindung wurde gelöscht.
+delete#:#Löschen
+conn_id#:#Cloud-Anbindung
+overview_uses#:#Übersicht Verwendungen
+references#:#Verknüpfungen
+create_info#:#Anbindung des Cloud-Services OwnCloud
+proxy#:#Proxy
+configuration#:#Einstellungen
+creation_frm_base_directory#:#Basis-Ordner
+creation_frm_base_directory_info#:#Mit führendem /
+choose_root#:#Bitte wählen Sie unten den gewünschten zu verlinkenden Ordner aus. <br>Hinweis: Bei vielen Dateien kann das Darstellen der Ordnerinhalte einige Zeit in Anspruch nehmen. Der Pfad des gewünschten Ordners kann auch manuell in den Einstellungen eingegeben werden.
+link_choose_root#:#Ordner auswählen
+no_connection#:#Es konnte keine Verbindung zum Cloud-Service hergestellt werden. Bitte überprüfen Sie Einstellungen und kontaktieren Sie allenfalls die technische Betreuung.
+no_connection_short#:#Es konnte keine Verbindung zum Cloud-Service hergestellt werden.
+base_directory#:#Basis-Verzeichnis
+base_directory_info#:#Dieses Verzeichnis wird bei neu erstellten Objekten als Basis-Ordner gewählt. Dies soll verhindern, dass bei neuen Objekten die gesamte OwnCloud eingebunden wird. Der Basis-Ordner kann später trotzdem angepasst werden.
+hint#:#Hinweistext
+server_url#:#Server-URL
+proxy_url#:#Proxy-URL
+proxy_url_info#:#Die Proxy-URL wird beim Anlegen einer neuen Cloud-Anbindung aus den ILIAS Setup Einstellungen eingefügt.
+webdav_url#:#WebDav-Server-URL
+webdav_url_info#:#WebDav-Server-URL wenn abweichend von der Server-URL. Dies ist beispielsweise der Fall, wenn der Cloud-Service in derselben Infrastruktur gehostet wird und über die interne Adresse angesprochen werden muss. Beispiel: http://SERVER_HOST:8080
+webdav_path#:#WebDAV-Pfad
+oa2_active#:#OAuth2-Authentifizierung
+oa2_active_info#:#Eine Anmeldung ist nur beim ersten Anlegen eines Cloud-Ordners erforderlich. Anschließend wird ein persönliches Token zur Authentifizierung verwendet. Es werden keine Passwörter in ILIAS gespeichert.
+oa2_client_id#:#Client Identifier
+oa2_client_secret#:#Secret
+oa2_path#:#OAuth2-Pfad
+oa2_token_request_auth#:#Token-Request Authentifizierung
+oa2_token_request_auth_info#:#Definiert, auf welche Art Token-Requests authentifiziert werden (experimentell - für NextCloud wird möglicherweise "Post Body" benötigt).
+extended_networking#:#Erweiterte Netzwerkeinstellungen
+extended_networking_info#:#Nur in bestimmten Systemkonfigurationen relevant. Bitte kontaktieren Sie hierzu die technische Betreuung.
+header#:#Basic (Header)
+post_body#:#Post Body
+default_info#:#Default: %s
+info_token_expires#:#Access-Token läuft aus
+root_folder#:#Ordner
+not_authorized#:#Authentifizierung fehlgeschlagen. Bitte Laden Sie die Seite erneut, um an die Authentifizierungsstelle weitergeleitet zu werden.
+only_owner#:#Nur die Person, die den Cloud-Ordner angelegt hat, kann diesen aktuell öffnen.
+open_in_owncloud#:#In externem Editor öffnen
+cld_add#:#Neuer Cloud-Ordner
+cld_add_download_failed#:#Download fehlgeschlagen
+cld_add_file#:#Datei
+cld_add_folder#:#Ordner
+cld_add_items_from_service_failed#:#Hinzufügen eines Items vom Service ist fehlgeschlagen. Bitte kontaktieren Sie die technische Betreuung.
+cld_add_new_item#:#Neues Objekt hinzufügen
+cld_auth_failed#:#Authentifzierung fehlgeschlagen
+cld_auth_failed_no_object_created#:#Authentifzierung fehlgeschlagen. Es wurde kein Cloud-Objekt angelegt.
+cld_authentication_failed#:#:#Authentifzierung fehlgeschlagen
+cld_config_entry_does_not_exist#:#Der Konfigurationswert existiert nicht in der Konfigurationstabelle
+cld_config_no_valid_get_or_set_function#:#Ungültige Set- oder Getfunktion
+cld_config_table_does_not_exist#:#Konfigurationstabelle existiert nicht
+cld_config_unknown_exception#:#Unbekannter Fehler
+cld_confirm_delete_file#:#Sind Sie sicher, dass folgende Datei gelöscht werden soll?
+cld_confirm_delete_folder#:#Sind Sie sicher, dass folgender Ordner gelöscht werden soll?
+cld_create_folder#:#Ordner anlegen
+cld_delete_failed#:#Löschen fehlgeschlagen
+cld_edit_Settings#:#Cloud Einstellungen
+cld_file_deleted#:#Objekt gelöscht
+cld_file_not_existing_on_service#:#Datei existiert in der Cloud nicht:
+cld_folder_already_existing_on_service#:#Ordner existiert bereits in der Cloud
+cld_ressource_not_existing_or_renamed#:#Der Ordner oder die Datei existiert nicht mehr in der Cloud oder wurde umbenannt. Klicken Sie auf den Reiter "Inhalt".
+cld_root_folder_not_existing_or_renamed#:#Der ausgewählte Ordner existiert nicht im Cloud-Service oder wurde umbenannt. Klicken Sie auf den Reiter "Einstellungen", und wählen Sie einen neuen Ordner aus.
+cld_folder_created#:#Ordner angelegt
+cld_folder_creation_failed#:#Erstellung des Ordners ist fehlgeschlagen
+cld_folder_name#:#Titel
+cld_folder_not_existing_on_service#:#Ordner existiert nicht in der Cloud
+cld_id_already_exists_in_file_tree_in_session#:#Die Id existiert bereits in der Session:
+cld_id_does_not_exist_in_file_tree_in_session#:#Die Id existiert nicht in der Session
+cld_info_add_file_to_current_directory#:#Datei zum Verzeichnis hinzufügen
+cld_info_add_folder_to_current_directory#:#Ordner zum Verzeichnis hinzufügen
+cld_invalid_input#:#Ungültige Eingabe
+cld_invalid_input_allowed#:#Erlaubte Zeichen sind: %s
+cld_new#:#Neues Cloud Objekt hinzufügen
+cld_no_service_active#:#Leider ist kein Cloud-Plugin aktiviert
+cld_no_service_selected#:#Es wurde kein Cloud-Service ausgewählt.
+cld_not_authenticated_offline#:#Nicht authentifiziert - Offline
+cld_object_added#:#Ein neuer Cloud-Ordner wurde hinzugefügt
+cld_only_owner_has_permission_to_change_root_path#:#Nur die Person, die den Cloud-Ordner angelegt hat, kann diese Angabe ändern.
+cld_path_does_not_exist_in_file_tree_in_session#:#Pfad existiert in der Session nicht:
+cld_permission_denied#:#Zugriff verweigert
+cld_permission_to_change_root_folder_denied#:#Zugriff für das Ändern des Basisiverzeichnis wurde verweigert.
+cld_plugin_hook_could_not_be_instantiated#:#Die Plugin-Hook Klasse konnte nicht instanziert werden.
+cld_plugin_not_active#:#Das Plugin für den gewählten Cloud-Service ist nicht aktiv.
+cld_root_folder#:#Ordnerstruktur
+cld_service#:#Service
+cld_service_class_file_not_found#:#Die Datei der Serviceklasse wurde nicht gefunden.
+cld_service_not_active#:#Der gewählte Cloud-Service ist nicht aktiv
+cld_service_specific_settings#:#spezifische Einstellungen
+cld_unknown_exception#:#Unbekannter Fehler
+cld_upload_failed#:#Herunterladen fehlgeschlagen
+cld_upload_failed_max_filesize#:#Hochladen fehlgeschlagen. Maximale Dateigrösse wurde überschritten
+cld_upload_files#:#Dateiauswahl
+cld_no_connection#:#Es konnte keine Verbindung zum Cloud-Service hergestellt werden. Bitte überprüfen Sie Einstellungen und kontaktieren Sie allenfalls die technische Betreuung.
+cld_not_auth_completed#:#Noch nicht authentifiziert
+cld_not_authorized#:#Nicht authentifiziert
+info_hint#:#Der Hinweistext wird im Info-Reiter der Cloud-Ordner angezeigt.
+file_folder_not_visible#:#Sie haben nicht die nötigen Berechtigungen.
+node_is_null#:#Die Ressource konnte nicht gefunden werden.
+please_wait#:#Bitte warten
