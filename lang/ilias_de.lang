@@ -170,3 +170,8 @@ info_hint#:#Der Hinweistext wird im Info-Reiter der Cloud-Ordner angezeigt.
 file_folder_not_visible#:#Sie haben nicht die nötigen Berechtigungen.
 node_is_null#:#Die Ressource konnte nicht gefunden werden.
 please_wait#:#Bitte warten
+rep_robj_xcls_grp_create_xcls#:#Cloud-Ordner anlegen
+rep_robj_xcls_crs_create_xcls#:#Cloud-Ordner anlegen
+rep_robj_xcls_fold_create_xcls#:#Cloud-Ordner anlegen
+rep_robj_xcls_cat_create_xcls#:#Cloud-Ordner anlegen
+rep_robj_xcls_root_create_xcls#:#Cloud-Ordner anlegen
