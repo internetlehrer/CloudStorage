@@ -169,3 +169,8 @@ info_hint#:#The hint text is displayed in the info tab of the Cloud Folders.
 file_folder_not_visible#:#Permission denied.
 node_is_null#:#Ressource could not be found.
 please_wait#:#Please wait
+rep_robj_xcls_grp_create_xcls#:#Create Cloud Folder
+rep_robj_xcls_crs_create_xcls#:#Create Cloud Folder
+rep_robj_xcls_fold_create_xcls#:#Create Cloud Folder
+rep_robj_xcls_cat_create_xcls#:#Create Cloud Folder
+rep_robj_xcls_root_create_xcls#:#Create Cloud Folder
