@@ -832,7 +832,6 @@ class ilObjCloudStorage extends ilObjectPlugin
         $tables = array(
             "adv_md_record_objs",
             "adv_md_substitutions",
-            "cal_shared",
             "didactic_tpl_sa",
             "history",
             "il_cert_template",
