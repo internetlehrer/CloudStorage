@@ -219,30 +219,30 @@ class ilCloudStorageConfigGUI extends ilPluginConfigGUI
         $this->object->setBaseDirectory($oldConn['base_directory']);
         $this->object->setCollaborationAppIntegration($this->object->ilIntToBool((int) $oldConn['collaboration_app_integration']));
         $this->object->setCollaborationAppFormats($oldConn['collaboration_app_integration_formats']);
-        $this->object->setCollaborationAppMappingField($oldConn['collaboration_app_integration_mapping_field']);
-        $this->object->setCollaborationAppUrl($oldConn['collaboration_app_integration_url']);
+        $this->object->setCollaborationAppMappingField((string) $oldConn['collaboration_app_integration_mapping_field']);
+        $this->object->setCollaborationAppUrl((string) $oldConn['collaboration_app_integration_url']);
         //$this->object->setOAuth2Active($this->object->ilIntToBool((int) $oldConn['oauth2_active']));
         $this->object->setOAuth2Active(true);
         if ($keepCredentials) {
-            $this->object->setOAuth2ClientId($oldConn['oauth2_active_oauth2_client_id']);
-            $this->object->setOAuth2ClientSecret($oldConn['oauth2_active_oauth2_client_secret']);
+            $this->object->setOAuth2ClientId((string) $oldConn['oauth2_active_oauth2_client_id']);
+            $this->object->setOAuth2ClientSecret((string) $oldConn['oauth2_active_oauth2_client_secret']);
         } else {
             $this->object->setOAuth2ClientId("");
             $this->object->setOAuth2ClientSecret("");
         }
         if ($oldConn['oauth2_active_oauth2_path'] !== '') {
-            $this->object->setOAuth2Path($oldConn['oauth2_active_oauth2_path']);
+            $this->object->setOAuth2Path((string) $oldConn['oauth2_active_oauth2_path']);
         }
-        $this->object->setOAuth2TokenRequestAuth($oldConn['oauth2_active_oauth2_token_request_auth']);
-        $this->object->setServerURL($oldConn['server_url']);
+        $this->object->setOAuth2TokenRequestAuth((string) $oldConn['oauth2_active_oauth2_token_request_auth']);
+        $this->object->setServerURL((string) $oldConn['server_url']);
         if ($oldConn['oauth2_active_oauth2_path'] !== '') {
-            $this->object->setOAuth2Path($oldConn['oauth2_active_oauth2_path']);
+            $this->object->setOAuth2Path((string) $oldConn['oauth2_active_oauth2_path']);
         }
         if ($oldConn['webdav_path'] !== '') {
-            $this->object->setWebDavPath($oldConn['webdav_path']);
+            $this->object->setWebDavPath((string) $oldConn['webdav_path']);
         }
-        $this->object->setTitle($oldConn['service_title']);
-        $this->object->setHint($oldConn['service_info']);
+        $this->object->setTitle((string) $oldConn['service_title']);
+        $this->object->setHint((string) $oldConn['service_info']);
         $this->object->setAvailability(ilCloudStorageConfig::AVAILABILITY_CREATE);
 
         $this->object->save(false);
