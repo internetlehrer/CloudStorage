@@ -7,5 +7,11 @@
     "classmap": [
       "classes/"
     ]
+  },
+  "replace": {
+    "psr/http-message": "*",
+    "guzzlehttp/guzzle": "*",
+    "psr/http-client": "*",
+    "psr/http-factory": "*"
   }
 }
