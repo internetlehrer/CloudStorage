@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use ILIAS\DI\Container;
 
 /**
@@ -76,6 +78,8 @@ class ilCloudStorageConfigGUI extends ilPluginConfigGUI
                 $this->$cmd();
                 break;
             case "overviewUses":
+            case "applyFilter":
+            case "resetFilter":
                 $this->initTabs();
                 $this->initOverviewUsesTableGUI($cmd);
                 break;
@@ -123,172 +127,12 @@ class ilCloudStorageConfigGUI extends ilPluginConfigGUI
         $tpl = $this->dic->ui()->mainTemplate();
         $ilTabs = $this->dic->tabs();
         $ilTabs->activateTab('configure');
-        $oldObjects = ilObjCloudStorage::getOldCloudObjectReferences();
-
-        if (count($oldObjects) > 0) {
-            $tpl->setContent($this->initMigrationForm()->getHTML());
-        } else {
-            $table_gui = new ilCloudStorageConnTableGUI($this, 'configure');
-            $table_gui->init($this);
-            $html = $table_gui->getHTML();
-            $tpl->setContent($html);
-        }
+        $table_gui = new ilCloudStorageConnTableGUI($this, 'configure');
+        $table_gui->init($this);
+        $html = $table_gui->getHTML();
+        $tpl->setContent($html);
     }
-
-    public function initMigrationForm(): ilPropertyFormGUI
-    {
-        $form = new ilPropertyFormGUI();
-        $form->setTitle($this->plugin_object->txt("plugin_migration"));
-        $form->setId('plugin_migration');
-        $form->setDescription($this->plugin_object->txt("migrate_desc"));
-        $form->setFormAction($this->dic->ctrl()->getFormAction($this));
-        $form->addCommandButton("migrateOld", $this->plugin_object->txt("migrate_old"));
-        //$form->addCommandButton("deleteOld", $this->plugin_object->txt("delete_old"));
-        //$cb = new ilCheckboxInputGUI($this->plugin_object->txt("keep_credentials"), "keepCredentials");
-        //$form->addItem($cb);
-        return $form;
-    }
-
-    function migrateOld(): void {
-        $gui = new ilConfirmationGUI();
-        $gui->setFormAction($this->dic->ctrl()->getFormAction($this));
-        $objects = ilObjCloudStorage::getOldCloudObjectReferences();
-        $info = (count($objects) > 0) ? ": " . count($objects) . " " . $this->lng->txt("objects") : "";
-        $gui->setHeaderText($this->plugin_object->txt('migrate_old') . $info);
-        $gui->setConfirm($this->plugin_object->txt('migrate_old'), 'migrateOldConfirmed');
-        $gui->setCancel($this->lng->txt('cancel'), 'configure');
-        /*
-        if ($this->dic->http()->wrapper()->post()->has('keepCredentials')) {
-            $keepCredentials = $this->dic->http()->wrapper()->post()->retrieve('keepCredentials', $this->dic->refinery()->kindlyTo()->int());
-            $gui->addHiddenItem('keepCredentials',$keepCredentials);
-        }
-        */
-        $this->dic->ui()->mainTemplate()->setContent($gui->getHTML());
-    }
-
-    function deleteOld(): void {
-        $gui = new ilConfirmationGUI();
-        $gui->setFormAction($this->dic->ctrl()->getFormAction($this));
-        $objects = ilObjCloudStorage::getOldCloudObjectReferences();
-        $info = (count($objects) > 0) ? ": " . count($objects) . " " . $this->lng->txt("objects") : "";
-        $gui->setHeaderText($this->plugin_object->txt('delete_old') . $info);
-        $gui->setConfirm($this->plugin_object->txt('delete_old'), 'deleteOldConfirmed');
-        $gui->setCancel($this->dic->language()->txt('cancel'), 'configure');
-        $this->dic->ui()->mainTemplate()->setContent($gui->getHTML());
-    }
-
-    function migrateOldConfirmed(): void {
-        //$keepCredentials = $this->dic->http()->wrapper()->post()->has('keepCredentials');
-        $keepCredentials = true;
-        // first migrate owncloud connection
-        
-        //normally should always be 1
-        $connId = $this->migrateOldConn($keepCredentials);
-        $typeId = $this->migrateOldType();
-        $this->migrateOldObjects($connId, $keepCredentials);
-
-        // required for ilCtrlStructur reload (does not work)
-        // $db_update = new ilDBUpdate($this->dic->database());
-        // $db_update->getUpdateSteps(); // this initializes global ilCtrlStructureReader
-        // $GLOBALS['ilCtrlStructureReader']->readStructure();
-        
-        $this->dic->ctrl()->setParameter($this, 'conn_id', $connId);
-        $this->dic->ui()->mainTemplate()->setOnScreenMessage('success', $this->plugin_object->txt('migrate_success'), true);
-        $this->dic->ctrl()->redirect($this, 'configure');
-        
-        // if ($keepCredentials) { // success
-        //     $this->dic->ui()->mainTemplate()->setOnScreenMessage('success', $this->plugin_object->txt('migrate_success'), true);
-        //     $this->dic->ctrl()->redirect($this, 'configure');
-        // } else { // for editing new credentials
-        //     $this->dic->ui()->mainTemplate()->setOnScreenMessage('success', $this->plugin_object->txt('migrate_success'), true);
-        //     $this->dic->ui()->mainTemplate()->setOnScreenMessage('info', $this->plugin_object->txt('fill_new_credentials'), true);
-        //     $this->dic->ctrl()->redirect($this, 'editCloudStorageConn');
-        // }
-    }
-
-    function migrateOldConn(bool $keepCredentials = true): int {        
-        $oldConn = ilObjCloudStorage::getOldCloudConn();
-        if (count($oldConn) == 0) {
-            $this->dic->logger()->root()->debug("no connection for old cloud objects?");
-            $this->dic->ui()->mainTemplate()->setOnScreenMessage('failure', $this->plugin_object->txt('migration_error_no_connection_data'), true);
-            $this->dic->ctrl()->redirect($this, 'configure');
-        }
-        $this->object = ilCloudStorageConfig::getInstance();
-        $this->object->setServiceId("ocld");
-        $this->object->setDefaultValues();
-        $this->object->setBaseDirectory($oldConn['base_directory']);
-        $this->object->setCollaborationAppIntegration($this->object->ilIntToBool((int) $oldConn['collaboration_app_integration']));
-        $this->object->setCollaborationAppFormats($oldConn['collaboration_app_integration_formats']);
-        $this->object->setCollaborationAppMappingField($oldConn['collaboration_app_integration_mapping_field']);
-        $this->object->setCollaborationAppUrl($oldConn['collaboration_app_integration_url']);
-        //$this->object->setOAuth2Active($this->object->ilIntToBool((int) $oldConn['oauth2_active']));
-        $this->object->setOAuth2Active(true);
-        if ($keepCredentials) {
-            $this->object->setOAuth2ClientId($oldConn['oauth2_active_oauth2_client_id']);
-            $this->object->setOAuth2ClientSecret($oldConn['oauth2_active_oauth2_client_secret']);
-        } else {
-            $this->object->setOAuth2ClientId("");
-            $this->object->setOAuth2ClientSecret("");
-        }
-        if ($oldConn['oauth2_active_oauth2_path'] !== '') {
-            $this->object->setOAuth2Path($oldConn['oauth2_active_oauth2_path']);
-        }
-        $this->object->setOAuth2TokenRequestAuth($oldConn['oauth2_active_oauth2_token_request_auth']);
-        $this->object->setServerURL($oldConn['server_url']);
-        if ($oldConn['oauth2_active_oauth2_path'] !== '') {
-            $this->object->setOAuth2Path($oldConn['oauth2_active_oauth2_path']);
-        }
-        if ($oldConn['webdav_path'] !== '') {
-            $this->object->setWebDavPath($oldConn['webdav_path']);
-        }
-        $this->object->setTitle($oldConn['service_title']);
-        $this->object->setHint($oldConn['service_info']);
-        $this->object->setAvailability(ilCloudStorageConfig::AVAILABILITY_CREATE);
-
-        $this->object->save(false);
-
-        return $this->object->getConnId();
-    }
-
-    function migrateOldType(): int {
-        $oldTypeId = ilObjCloudStorage::getOldCloudTypeId();
-        $this->dic->logger()->root()->debug("old type id: " . $oldTypeId);
-        if ($oldTypeId == -1) {
-            $this->dic->ui()->mainTemplate()->setOnScreenMessage('failure', $this->plugin_object->txt('migration_error_no_cloud_type'), true);
-            $this->dic->ctrl()->redirect($this, 'configure');
-        }
-        ilObjCloudStorage::deleteNewCloudTypeTitle();
-        ilObjCloudStorage::mapNewCloudTypeTitle();
-        ilObjCloudStorage::mapNewCloudTypes();
-        return $oldTypeId;
-    }
-
-    function migrateOldObjects(int $connId, bool $keepCredentials = true): void {
-        $this->dic->logger()->root()->debug("migrateOldObjects: connId: " . $connId);
-        if ($keepCredentials) {
-            ilObjCloudStorage::mapCloudTokens($connId);
-        }
-        ilObjCloudStorage::mapCloudObjects($connId);
-        ilObjCloudStorage::mapObjectDataDel();
-        ilObjCloudStorage::mapObjectSubObj();
-        ilObjCloudStorage::mapRBACTemplates();
-        ilObjCloudStorage::disableOldCloudObject();
-        ilObjCloudStorage::mapCreateRBACOperation();
-        ilObjCloudStorage::mapAllOther();
-    }
-
-    function deleteOldConfirmed(): void {
-        $this->dic->ui()->mainTemplate()->setContent("<pre>kommt noch</pre>");
-        /*
-        $gui = new ilConfirmationGUI();
-        $gui->setFormAction($this->dic->ctrl()->getFormAction($this));
-        $gui->setHeaderText($this->plugin_object->txt('delete_old'));
-        $gui->setConfirm($this->plugin_object->txt('delete_old'), 'deleteOldConfirmed');
-        $gui->setCancel($this->dic->language()->txt('cancel'), 'configure');
-        $this->dic->ui()->mainTemplate()->setContent($gui->getHTML());
-        */
-    }
-
+    
     private function createCloudStorageConn(): void
     {
         $tpl = $this->dic->ui()->mainTemplate();
@@ -319,7 +163,7 @@ class ilCloudStorageConfigGUI extends ilPluginConfigGUI
         }
         $rg->setValue(array_search($this->fsDefaultType, ilCloudStorageConfig::AVAILABLE_FS_CONN));
         $this->form->addItem($rg);
-        $this->form->addCommandButton("editCloudStorageConn", $this->plugin_object->txt("configure_add"));
+        $this->form->addCommandButton("editCloudStorageConn", $this->plugin_object->txt("add_type"));
         $this->form->addCommandButton("configure", $this->lng->txt("cancel"));
     }
 
@@ -338,7 +182,7 @@ class ilCloudStorageConfigGUI extends ilPluginConfigGUI
         $gui = new ilConfirmationGUI();
         $gui->setFormAction($this->dic->ctrl()->getFormAction($this));
         $gui->setHeaderText($this->dic->language()->txt('rep_robj_xcls_delete_conn'));
-        $gui->addItem('conn_id', $this->object->getConnId(), $this->object->getTitle());
+        $gui->addItem('conn_id', (string) $this->object->getConnId(), $this->object->getTitle());
         $gui->setConfirm($this->dic->language()->txt('rep_robj_xcls_delete'), 'deleteCloudStorageConnConfirmed');
         $gui->setCancel($this->dic->language()->txt('cancel'), 'configure');
 
@@ -373,23 +217,34 @@ class ilCloudStorageConfigGUI extends ilPluginConfigGUI
         $this->form->addItem($ti);
         
         // availability
-        $item = new ilSelectInputGUI($this->plugin_object->txt('conf_availability'), 'cb_availability');
-        $item->setOptions(
-            array(
-                ilCloudStorageConfig::AVAILABILITY_CREATE => $this->plugin_object->txt('conf_availability_' . ilCloudStorageConfig::AVAILABILITY_CREATE),
-                ilCloudStorageConfig::AVAILABILITY_EXISTING => $this->plugin_object->txt('conf_availability_' . ilCloudStorageConfig::AVAILABILITY_EXISTING),
-                ilCloudStorageConfig::AVAILABILITY_NONE => $this->plugin_object->txt('conf_availability_' . ilCloudStorageConfig::AVAILABILITY_NONE)
+
+        $rg = new ilRadioGroupInputGUI($this->plugin_object->txt("conf_availability"), "availability");
+        $rg->setRequired(true);
+        $rg->setInfo($this->plugin_object->txt('info_availability'));
+        $ros = array(
+            ilCloudStorageConfig::AVAILABILITY_CREATE => array(
+                'text' => $this->plugin_object->txt('conf_availability_' . ilCloudStorageConfig::AVAILABILITY_CREATE),
+                'info' => $this->plugin_object->txt('conf_availability_info_' . ilCloudStorageConfig::AVAILABILITY_CREATE)
+            ),
+            ilCloudStorageConfig::AVAILABILITY_EXISTING => array(
+                'text' => $this->plugin_object->txt('conf_availability_' . ilCloudStorageConfig::AVAILABILITY_EXISTING),
+                'info' => $this->plugin_object->txt('conf_availability_info_' . ilCloudStorageConfig::AVAILABILITY_EXISTING)
+            ),
+            ilCloudStorageConfig::AVAILABILITY_NONE => array(
+                'text' => $this->plugin_object->txt('conf_availability_' . ilCloudStorageConfig::AVAILABILITY_NONE),
+                'info' => $this->plugin_object->txt('conf_availability_info_' . ilCloudStorageConfig::AVAILABILITY_NONE)
             )
         );
-        $item->setInfo($this->plugin_object->txt('info_availability'));
-        $item->setRequired(true);
-        $this->form->addItem($item);
+        foreach ($ros as $key => $value) {
+            $ro = new ilRadioOption($value['text'], (string) $key, $value['info']);
+            $rg->addOption($ro);
+        }
+        $this->form->addItem($rg);
 
         // Hint TextArea
         //$ti = new ilTextInputGUI($pl->txt("hint"), "hint");
         //$ti->setInfo($pl->txt("info_hint"));
         //$this->form->addItem($ti);
-        
 
         $hi = new ilHiddenInputGUI("hint");
         $hi->setValue("not supported");
@@ -442,10 +297,9 @@ class ilCloudStorageConfigGUI extends ilPluginConfigGUI
             if ($value == null) {
                 $value = '';
             }
-            $field->setValue($value);
+            $field->setValue((string) $value);
             return $field;
         };
-
 
         $formFieldItems = $this->form->getInputItemsRecursive();
         $formHasField = [];
@@ -468,7 +322,7 @@ class ilCloudStorageConfigGUI extends ilPluginConfigGUI
         $values["conn_id"]                  = $this->object->getConnId();
         $values["title"]                    = $this->object->getTitle();
         $values["hint"]                     = $this->object->getHint();
-        $values["cb_availability"]          = $this->object->getAvailability();
+        $values["availability"]          = $this->object->getAvailability();
         $values['account']                  = $this->object->getAccount();
         $values['account_username']         = $this->object->getAccountUsername();
         $values['account_password']         = $this->object->getAccountPassword();
@@ -478,7 +332,6 @@ class ilCloudStorageConfigGUI extends ilPluginConfigGUI
         $values['col_app_formats']         = $this->object->getCollaborationAppFormats();
         $values['col_app_mapping_field']   = $this->object->getCollaborationAppMappingField();
         $values['col_app_url']             = $this->object->getCollaborationAppUrl();
-        $values['oa2_active']               = $this->object->getOAuth2Active();
         $values['oa2_client_id']            = $this->object->getOAuth2ClientId();
         $values['oa2_client_secret']        = $this->object->getOAuth2ClientSecret();
         $values['oa2_path']                 = $this->object->getOAuth2Path();
@@ -514,10 +367,10 @@ class ilCloudStorageConfigGUI extends ilPluginConfigGUI
 
         if ($form->checkInput()) {
 
-            $this->object->setConnId(!!(bool)($connId = $form->getInput("conn_id")) ? $connId : null);
+            $this->object->setConnId(!!(bool)($connId = (int) $form->getInput("conn_id")) ? $connId : null);
             $this->object->setTitle($form->getInput("title"));
             $this->object->setHint((string)$this->object->removeUnsafeChars($form->getInput("hint")));
-            $this->object->setAvailability((int) $form->getInput("cb_availability"));
+            $this->object->setAvailability((int) $form->getInput("availability"));
             $this->object->setAccount((bool) ($form->getInput("account")));
             $this->object->setAccountUsername($form->getInput("account_username"));
             $this->object->setAccountPassword($form->getInput("account_password"));
@@ -527,7 +380,7 @@ class ilCloudStorageConfigGUI extends ilPluginConfigGUI
             $this->object->setCollaborationAppFormats($form->getInput("col_app_formats"));
             $this->object->setCollaborationAppMappingField($form->getInput("col_app_mapping_field"));
             $this->object->setCollaborationAppUrl($form->getInput("col_app_url"));
-            $this->object->setOAuth2Active(true);
+            $this->object->setAuthMethod($form->getInput("auth_method"));
             $this->object->setOauth2ClientId(trim($form->getInput("oa2_client_id")));
             $this->object->setOauth2ClientSecret(trim($form->getInput("oa2_client_secret")));
             $this->object->setOauth2Path($form->getInput("oa2_path"));
@@ -557,7 +410,7 @@ class ilCloudStorageConfigGUI extends ilPluginConfigGUI
         $values = [];
         $values['conn_id']                  = $this->object->getConnId();
         $values['title']                    = $this->object->getTitle();
-        $values['cb_availability']          = $this->object->getAvailability();
+        $values['availability']          = $this->object->getAvailability();
         $values['hint']                     = $this->object->getHint();
         $values['account']                  = $this->object->getAccount();
         $values['account_username']         = $this->object->getAccountUsername();
@@ -568,7 +421,6 @@ class ilCloudStorageConfigGUI extends ilPluginConfigGUI
         $values['col_app_formats']         = $this->object->getCollaborationAppFormats();
         $values['col_app_mapping_field']   = $this->object->getCollaborationAppMappingField();
         $values['col_app_url']             = $this->object->getCollaborationAppUrl();
-        $values['oa2_active']               = $this->object->getOAuth2Active();
         $values['oa2_client_id']            = $this->object->getOAuth2ClientId();
         $values['oa2_client_secret']        = $this->object->getOAuth2ClientSecret();
         $values['oa2_path']                 = $this->object->getOAuth2Path();
@@ -591,10 +443,11 @@ class ilCloudStorageConfigGUI extends ilPluginConfigGUI
         $ilTabs = $this->dic->tabs();
 
         $ilTabs->activateTab('overview_uses');
-
-        $rows = ilCloudStorageConfig::_getCloudStorageConnOverviewUses();
+        
+        $table_gui = new ilCloudStorageOverviewUsesTableGUI($this, $cmd);
+        $table_gui->init($this);
+        $rows = ilCloudStorageConfig::_getCloudStorageConnOverviewUses($table_gui->filter);
         foreach ($rows as $key => $row) {
-
             if((bool)$row['isInTrash']) {
                 if(ilObject::_isInTrash($row['xclsRefId'])) {
                     $row['parentRefId'] = $row['xclsRefId'];
@@ -605,11 +458,8 @@ class ilCloudStorageConfigGUI extends ilPluginConfigGUI
             $rows[$key]['parentLink'] = ilLink::_getLink($row['parentRefId']);
             $rows[$key]['link'] = ilLink::_getLink($row['xclsRefId']);
         } // EOF foreach ($rows as $key => $row)
-        #var_dump($rows); exit;
-
-        $table_gui = new ilCloudStorageOverviewUsesTableGUI($this, $cmd);
         $table_gui->setData($rows);
-        $table_gui->init($this);
+        #var_dump($rows); exit;
         $tpl->setContent($table_gui->getHTML());
 
         if(!$html) {
@@ -640,17 +490,19 @@ class ilCloudStorageConfigGUI extends ilPluginConfigGUI
 
         $c_gui = new ilConfirmationGUI();
 
+        $header = ($this->dic->http()->wrapper()->query()->has('purge')) ? $DIC->language()->txt("rep_robj_xcls_purge_confirm") : $DIC->language()->txt("rep_robj_xcls_info_delete_folder");
+        
         // set confirm/cancel commands
         $c_gui->setFormAction($DIC->ctrl()->getFormAction($this, "overviewUses"));
-        $c_gui->setHeaderText($DIC->language()->txt("rep_robj_xcls_info_delete_fs_sure"));
+        $c_gui->setHeaderText($header);
         $c_gui->setCancel($DIC->language()->txt("cancel"), "overviewUses");
         $c_gui->setConfirm($DIC->language()->txt("confirm"), "deleteUsesCloudStorageConn");
 
         // add items to delete
         //include_once('Modules/Course/classes/class.ilCourseFile.php');
         $cGuiItemContent = $DIC->http()->wrapper()->query()->retrieve('cGuiItemContent', $DIC->refinery()->kindlyTo()->string());
-        $c_gui->addItem("item_ref_id", $item_ref_id, $cGuiItemContent);
-        $c_gui->addHiddenItem('parent_ref_id', $parent_ref_id);
+        $c_gui->addItem("item_ref_id", (string) $item_ref_id, $cGuiItemContent);
+        $c_gui->addHiddenItem('parent_ref_id', (string) $parent_ref_id);
         $DIC->ui()->mainTemplate()->setContent($c_gui->getHTML());
 
     }
@@ -702,4 +554,8 @@ class ilCloudStorageConfigGUI extends ilPluginConfigGUI
         return $this->dic->http()->wrapper()->query()->retrieve('conn_id', $this->dic->refinery()->kindlyTo()->int());
     }
 
+    public function txt(string $text): string
+    {
+        return $this->plugin_object->txt($text);
+    }
 }

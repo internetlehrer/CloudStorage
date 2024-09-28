@@ -1,7 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * Class ilCloudStorageOwnCloudTreeGUI
+ * Class ilCloudStorageTreeGUI
  *
  * @author  Theodor Truffer <tt@studer-raimann.ch>
  */
@@ -9,7 +11,7 @@
 
 // use ILIAS\DI\Container;
 
-class ilCloudStorageOwnCloudTreeGUI extends ilTreeExplorerLegacyGUI
+class ilCloudStorageTreeGUI extends ilCloudStorageTreeExplorerLegacyGUI
 {
 
     //private Container $dic;
@@ -19,8 +21,8 @@ class ilCloudStorageOwnCloudTreeGUI extends ilTreeExplorerLegacyGUI
     // protected $log;
 
     // Sn: ToDo does this really work? 
-    // parent constructor ilTreeExplorerGUI needs ilTree so i extended ilCloudStorageOwnCloudTree from ilTree (?)
-    public function __construct(string $a_expl_id, ilObjCloudStorageGUI $a_parent_obj, string $a_parent_cmd, ilCloudStorageOwnCloudTree $tree)
+    // parent constructor ilTreeExplorerGUI needs ilTree so i extended ilCloudStorageTree from ilTree (?)
+    public function __construct(string $a_expl_id, ilObjCloudStorageGUI $a_parent_obj, string $a_parent_cmd, ilCloudStorageTree $tree)
     {
         global $tpl, $ilLog;
         //global $DIC;
@@ -51,7 +53,7 @@ class ilCloudStorageOwnCloudTreeGUI extends ilTreeExplorerLegacyGUI
 
     function getNodeIcon($a_node): string
     {
-        if ($a_node->getType() == ilCloudStorageOwnCloudItem::TYPE_FILE) {
+        if ($a_node->getType() == ilCloudStorageItem::TYPE_FILE) {
             $img = 'icon_dcl_file.svg';
         } else {
             $img = 'icon_dcl_fold.svg';
@@ -67,7 +69,7 @@ class ilCloudStorageOwnCloudTreeGUI extends ilTreeExplorerLegacyGUI
     function getNodeContent($node): string
     {   
         assert($this->parent_obj instanceof ilObjCloudStorageGUI);
-        $node->getName() ? $name = $node->getName() : $name = $this->parent_obj->object->getTitle();
+        $node->getName() ? $name = $node->getName() : $name = $this->parent_obj->getRootName();
         return htmlspecialchars($name);
     }
 
@@ -96,7 +98,7 @@ class ilCloudStorageOwnCloudTreeGUI extends ilTreeExplorerLegacyGUI
 
     function isNodeClickable($node): bool
     {
-        return ($node->getType() == ilCloudStorageOwnCloudItem::TYPE_FOLDER);
+        return ($node->getType() == ilCloudStorageItem::TYPE_FOLDER);
     }
 
 
@@ -110,7 +112,7 @@ class ilCloudStorageOwnCloudTreeGUI extends ilTreeExplorerLegacyGUI
      */
     function getRootNode()
     {
-        assert($this->tree instanceof ilCloudStorageOwnCloudTree);
+        assert($this->tree instanceof ilCloudStorageTree);
         return $this->tree->getRootNode();
     }
 

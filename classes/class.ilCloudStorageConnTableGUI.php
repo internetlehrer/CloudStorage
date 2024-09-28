@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 /**
  * @author  Stefan Schneider <eqsoft4@gmail.com>
  * GPLv2, see LICENSE
@@ -55,8 +58,8 @@ class ilCloudStorageConnTableGUI extends ilTable2GUI
         $this->addCommandButton('createCloudStorageConn', $this->dic->language()->txt('rep_robj_xcls_create_type'));
         // ToDo: check
         // $this->addCommandButton('viewLogs', $lng->txt('rep_robj_xxcf_view_logs'));
-
-        $this->setRowTemplate('tpl.types_row.html', 'Customizing/global/plugins/Services/Repository/RepositoryObject/CloudStorage');
+        
+        $this->setRowTemplate(ilObjCloudStorage::PLUGIN_PATH . "/templates/tpl.types_row.html");
         $this->getMyDataFromDb();
     }
 

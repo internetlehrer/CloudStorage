@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 /**
 * Application class for CloudStorage repository object.
 *
@@ -44,12 +47,6 @@ class ilObjCloudStorage extends ilObjectPlugin
     private string $rootFolder = '';
 
     private string $rootId = '';
-
-    private string $baseUri = '';
-
-    private string $username = '';
-
-    private string $password = '';
 
     private bool $authComplete = false;
 
@@ -111,9 +108,6 @@ class ilObjCloudStorage extends ilObjectPlugin
             'conn_id'                   => array('integer', $this->getConnId()),
             'root_folder'               => array('text', $this->getRootFolder()),
             'root_id'                   => array('text', $this->getRootId()),
-            'base_uri'                  => array('text', $this->getBaseUri()),
-            'username'                  => array('text', $this->getUsername()),
-            'password'                  => array('text', $this->getPassword()),
             'auth_complete'             => array('integer', $this->ilBoolToInt($this->getAuthComplete())),
             'owner_id'                  => array('integer', $this->getOwnerId())
         );
@@ -134,9 +128,6 @@ class ilObjCloudStorage extends ilObjectPlugin
             $this->setConnId((int)$record["conn_id"]);
             $this->setRootFolder($record["root_folder"]);
             $this->setRootId($record["root_id"]);
-            $this->setBaseUri($record["base_uri"]);
-            $this->setUsername($record["username"]);
-            $this->setPassword($record["password"]);
             $this->setAuthComplete($this->ilIntToBool($record["auth_complete"]));
             $this->setOwnerId((int)$record["owner_id"]);
         }
@@ -153,9 +144,6 @@ class ilObjCloudStorage extends ilObjectPlugin
             'conn_id'				    => array('integer', $this->getConnId()),
             'root_folder'               => array('text', $this->getRootFolder()),
             'root_id'                   => array('text', $this->getRootId()),
-            'base_uri'                  => array('text', $this->getBaseUri()),
-            'username'                  => array('text', $this->getUsername()),
-            'password'                  => array('text', $this->getPassword()),
             'auth_complete'             => array('integer', $this->ilBoolToInt($this->getAuthComplete())),
             'owner_id'				    => array('integer', $this->getOwnerId())
             
@@ -200,9 +188,6 @@ class ilObjCloudStorage extends ilObjectPlugin
             'conn_id'				    => array('integer', $this->getConnId()),
             'root_folder'               => array('text', $this->getRootFolder()),
             'root_id'                   => array('text', $this->getRootId()),
-            'base_uri'                  => array('text', $this->getBaseUri()),
-            'username'                  => array('text', $this->getUsername()),
-            'password'                  => array('text', $this->getPassword()),
             'auth_complete'             => array('integer', $this->ilBoolToInt($this->getAuthComplete())),
             'owner_id'				    => array('integer', $this->getOwnerId())
         );
@@ -292,36 +277,6 @@ class ilObjCloudStorage extends ilObjectPlugin
     public function setRootId(string $rootId): void
     {
         $this->rootId = $rootId;
-    }
-    
-    public function getBaseUri(): string
-    {
-        return $this->baseUri;
-    }
-
-    public function setBaseUri(string $baseUri): void
-    {
-        $this->baseUri = $baseUri;
-    }
-
-    public function getUsername(): string
-    {
-        return $this->username;
-    }
-
-    public function setUsername(string $username): void
-    {
-        $this->username = $username;
-    }
-
-    public function getPassword(): string
-    {
-        return $this->password;
-    }
-
-    public function setPassword(string $password): void
-    {
-        $this->password = $password;
     }
 
     public function getAuthComplete(): bool
@@ -599,7 +554,9 @@ class ilObjCloudStorage extends ilObjectPlugin
         $set1 = self::parseIniFile(self::INI_FILENAME);
 
         // Host specific ini settings (lms.example.com.ini)
-        $set2 = self::parseIniFile($DIC->http()->request()->getUri());
+        $set2 = self::parseIniFile($DIC->http()->request()->getUri()->__toString());
+
+        $DIC->http()->request()->getUri();
 
         // xmvc_conn specific ini settings (bbb.example.com.ini)
         $set3 = !is_null($settings) ? self::parseIniFile($settings->getServerURL()) : [];
@@ -642,279 +599,8 @@ class ilObjCloudStorage extends ilObjectPlugin
         return $returnParam;
     }
 
-    // Migration
-
+    // nothing to do in ILIAS 9
     public static function migrationSetup(): void {
-        
-        $oldObjects = self::getOldCloudObjectReferences();
-        
-        // if no old cloud objects create new type and add rbac operations
-        if (count($oldObjects) == 0) {
-            include_once('./Services/Migration/DBUpdate_3560/classes/class.ilDBUpdateNewObjectType.php');
-            $xcls_type_id = ilDBUpdateNewObjectType::addNewType('xcls', 'Cloud Folder');
-
-            $rbac_ops = array(
-                ilDBUpdateNewObjectType::RBAC_OP_EDIT_PERMISSIONS,
-                ilDBUpdateNewObjectType::RBAC_OP_VISIBLE,
-                ilDBUpdateNewObjectType::RBAC_OP_READ,
-                ilDBUpdateNewObjectType::RBAC_OP_WRITE,
-                ilDBUpdateNewObjectType::RBAC_OP_DELETE
-            );
-            ilDBUpdateNewObjectType::addRBACOperations($xcls_type_id, $rbac_ops);
-
-            $parent_types = array('root', 'cat', 'crs', 'fold', 'grp');
-            ilDBUpdateNewObjectType::addRBACCreate('create_xcls', 'Create Cloud Folder', $parent_types);
-
-            $ops_id = ilDBUpdateNewObjectType::addCustomRBACOperation('upload', 'Upload Items', 'object', 3240);
-            ilDBUpdateNewObjectType::addRBACOperation($xcls_type_id, $ops_id);
-            $ops_id = ilDBUpdateNewObjectType::addCustomRBACOperation('delete_files', 'Delete Files', 'object', 3260);
-            ilDBUpdateNewObjectType::addRBACOperation($xcls_type_id, $ops_id);
-            $ops_id = ilDBUpdateNewObjectType::addCustomRBACOperation('delete_folders', 'Delete Folders', 'object', 3270);
-            ilDBUpdateNewObjectType::addRBACOperation($xcls_type_id, $ops_id);
-            $ops_id = ilDBUpdateNewObjectType::addCustomRBACOperation('download', 'Download Items', 'object', 3230);
-            ilDBUpdateNewObjectType::addRBACOperation($xcls_type_id, $ops_id);
-            $ops_id = ilDBUpdateNewObjectType::addCustomRBACOperation('files_visible', 'Files are visible', 'object', 3210);
-            ilDBUpdateNewObjectType::addRBACOperation($xcls_type_id, $ops_id);
-            $ops_id = ilDBUpdateNewObjectType::addCustomRBACOperation('folders_visible', 'Folders are visible', 'object', 3220);
-            ilDBUpdateNewObjectType::addRBACOperation($xcls_type_id, $ops_id);
-            $ops_id = ilDBUpdateNewObjectType::addCustomRBACOperation('folders_create', 'Folders may be created', 'object', 3250);
-            ilDBUpdateNewObjectType::addRBACOperation($xcls_type_id, $ops_id);
-            $ops_id = ilDBUpdateNewObjectType::addCustomRBACOperation('edit_in_online_editor', 'edit in online editor', 'object', 280);
-            ilDBUpdateNewObjectType::addRBACOperation($xcls_type_id, $ops_id);
-
-        } else {
-            // this should be handled by migration:
-            // 1. if old objects will be migrated by gui: old cloud type and rbac operations are used
-            // 2. if old objects will be deleted   by gui: this function will be called again and type and rbac operations will be created
-        }
+        return;
     }
-
-    public static function getOldCloudObjectReferences(): array
-    {
-        global $DIC;
-        $ret = [];
-        $query = $DIC->database()->query("
-                    SELECT ref_id 
-                    FROM object_data, object_reference 
-                    WHERE object_data.type = 'cld' AND object_data.obj_id = object_reference.obj_id");
-        //$result = $DIC->database()->fetchObject($query);
-        while ($result = $DIC->database()->fetchAssoc($query)) {
-            $ret[] = $result;
-        }
-        return $ret;
-    }
-
-    public static function getOldCloudObjectIds(): array
-    {
-        global $DIC;
-        $ret = [];
-        $query = $DIC->database()->query("
-                    SELECT obj_id 
-                    FROM object_data, object_reference 
-                    WHERE object_data.type = 'cld' AND object_data.obj_id = object_reference.obj_id");
-        //$result = $DIC->database()->fetchObject($query);
-        while ($result = $DIC->database()->fetchAssoc($query)) {
-            $ret[] = $result;
-        }
-        return $ret;
-    }
-
-    public static function getOldCloudConn(): array
-    {
-        global $DIC;
-        $ret = [];
-        $query = $DIC->database()->query("SELECT * FROM cld_cldh_owncld_config");
-        //$result = $DIC->database()->fetchObject($query);
-        while ($result = $DIC->database()->fetchAssoc($query)) {
-            $ret[$result['config_key']] = $result['config_value'];
-        }
-        return $ret;
-    }
-
-    public static function getOldCloudTypeId(): int
-    {
-        global $DIC;
-        $ret = -1;
-        $query = $DIC->database()->query("SELECT obj_id FROM object_data WHERE type = 'typ' AND title = 'cld'");
-        //$result = $DIC->database()->fetchObject($query);
-        while ($result = $DIC->database()->fetchAssoc($query)) {
-            $ret = $result['obj_id'];
-        }
-        return $ret;
-    }
-
-    public static function deleteNewCloudTypeTitle(): void
-    {
-        global $DIC;
-        $DIC->database()->manipulate("DELETE FROM object_data WHERE type = 'typ' AND title = 'xcls'");
-    }
-
-    public static function disableOldCloudObject(): void
-    {
-        global $DIC;
-        $DIC->database()->manipulate("UPDATE settings SET value = 1 WHERE keyword = 'obj_dis_creation_cld'");
-    }
-
-    public static function mapNewCloudTypeTitle(): void
-    {
-        global $DIC;
-        $DIC->database()->manipulate("UPDATE object_data SET title = 'xcls' WHERE type = 'typ' AND title = 'cld'");
-    }
-
-
-    public static function mapNewCloudTypes(): void
-    {
-        global $DIC;
-        $DIC->database()->manipulate("UPDATE object_data SET type = 'xcls' WHERE type = 'cld'");
-    }
-
-    public static function remapOldCloudTypes(): void
-    {
-        global $DIC;
-        $DIC->database()->manipulate("UPDATE object_data SET type = 'cld' WHERE type = 'xcls'");
-    }
-
-    public static function mapCloudObjects(int $connId): void
-    {
-        global $DIC;
-        $query = $DIC->database()->query("SELECT * FROM il_cld_data");
-        while ($rec = $DIC->database()->fetchAssoc($query)) {
-            $DIC->database()->manipulatef(
-                'INSERT INTO rep_robj_xcls_data (id, is_online, conn_id, root_folder, root_id, base_uri, username, password, owner_id, auth_complete)
-                 VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)',
-                array('integer','integer', 'integer', 'text', 'text', 'text', 'text', 'text', 'integer', 'integer'),
-                array($rec["id"], $rec["is_online"], $connId, $rec["root_folder"], '', '', '', '', $rec["owner_id"], $rec["auth_complete"])
-            );
-        }
-    }
-
-    public static function mapObjectDataDel(): void
-    {
-        global $DIC;
-        $DIC->database()->manipulate("UPDATE object_data_del SET type = 'xcls' WHERE type = 'cld'");
-    }
-
-    public static function mapObjectSubObj(): void
-    {
-        global $DIC;
-        $DIC->database()->manipulate("UPDATE il_object_subobj SET subobj = 'xcls' WHERE subobj = 'cld'");
-    }
-
-    public static function mapCreateRBACOperation(): void {
-        global $DIC;
-        $DIC->database()->manipulate("DELETE FROM rbac_operations WHERE operation = 'create_xcls'");
-        $DIC->database()->manipulate("UPDATE rbac_operations SET operation = 'create_xcls' WHERE operation = 'create_cld'");
-    }
-
-    public static function mapRBACTemplates(): void
-    {
-        global $DIC;
-        $DIC->database()->manipulate("UPDATE rbac_templates SET type = 'xcls' WHERE type = 'cld'");
-    }
-
-    public static function mapCloudTokens(int $conn_id): void
-    {
-        global $DIC;
-        $query = $DIC->database()->query("SELECT * FROM cld_cldh_owncld_token");
-        while ($rec = $DIC->database()->fetchAssoc($query)) {
-            $DIC->database()->manipulatef(
-                'INSERT INTO rep_robj_xcls_ocld_tk (conn_id, user_id, access_token, refresh_token, valid_through)
-                 VALUES(%s, %s, %s, %s, %s)',
-                array('integer','integer', 'text', 'text', 'integer'),
-                array($conn_id, $rec["user_id"], $rec["access_token"], $rec["refresh_token"], $rec["valid_through"])
-            );
-        }
-    }
-
-    public static function mapAllOther(): void
-    {
-        // obj_type
-        $tables = array(
-            "adv_md_record_objs",
-            "adv_md_substitutions",
-            "cal_shared",
-            "didactic_tpl_sa",
-            "history",
-            "il_cert_template",
-            "il_cert_user_cert",
-            "il_object_sub_type",
-            "il_rating",
-            "il_tag",
-            "like_data",
-            "note",
-            "note_settings",
-            "obj_stat",
-            "obj_stat_log",
-            "obj_stat_tmp",
-            "orgu_obj_type_settings",
-            "search_command_queue",
-            "ut_lp_settings"
-        );
-        foreach ($tables as $table) {
-            self::mapTable($table,"obj_type");
-        }
-
-        // target_type
-        $tables = array(
-            "conditions",
-            "int_link"
-        );
-        foreach ($tables as $table) {
-            self::mapTable($table,"target_type");
-        }
-    }
-
-
-    public static function mapTable(string $table, string $field) {
-        global $DIC;
-        if ($DIC->database()->tableExists($table)) {
-            $DIC->database()->manipulate("UPDATE " . $table . " SET " . $field . " = 'xcls' WHERE " . $field . " = 'cld'");
-        }
-    }
-    /*
-    obj_type:
-
-    adv_md_record_objs
-    adv_md_substitutions
-    cal_shared
-    didactic_tpl_sa
-    history
-    il_cert_template
-    il_cert_user_cert
-    il_meta_annotation
-    il_meta_classification
-    il_meta_contribute
-    il_meta_description
-    il_meta_educational
-    il_meta_entity
-    il_meta_format
-    il_meta_general
-    il_meta_identifier
-    il_meta_identifier_
-    il_meta_keyword
-    il_meta_language
-    il_meta_lifecycle
-    il_meta_location
-    il_meta_meta_data
-    il_meta_relation
-    il_meta_requirement
-    il_meta_rights
-    il_meta_tar
-    il_meta_taxon
-    il_meta_taxon_path
-    il_meta_technical
-
-    il_object_sub_type
-    il_rating
-    il_tag
-    like_data
-    note
-    note_settings
-    obj_stat
-    obj_stat_log
-    obj_stat_tmp
-    orgu_obj_type_settings
-    search_command_queue
-    ut_lp_settings
-    */
 }

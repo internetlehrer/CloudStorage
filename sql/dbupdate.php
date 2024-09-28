@@ -260,4 +260,70 @@ if (!$ilDB->tableExists('rep_robj_xcls_ocld_tk')) {
 require_once("./Customizing/global/plugins/Services/Repository/RepositoryObject/CloudStorage/classes/class.ilObjCloudStorage.php");
 ilObjCloudStorage::migrationSetup();
 ?>
-
+<#5>
+<?php
+if ($ilDB->tableExists('rep_robj_xcls_conn')) {
+    if ($ilDB->tableColumnExists('rep_robj_xcls_conn', 'auth_method')) {
+        $ilDB->queryF('UPDATE rep_robj_xcls_conn SET auth_method = %s WHERE auth_method = ""', array('text'), array('oauth2'));
+    }
+    if ($ilDB->tableColumnExists('rep_robj_xcls_conn', 'oa2_active')) {
+        $ilDB->dropTableColumn('rep_robj_xcls_conn','oa2_active');
+    }
+}
+?>
+<#6>
+<?php
+if ($ilDB->tableExists('rep_robj_xcls_ocld_tk')) {
+    $ilDB->renameTable('rep_robj_xcls_ocld_tk', 'rep_robj_xcls_oauth2');
+}
+?>
+<#7>
+<?php
+if (!$ilDB->tableExists('rep_robj_xcls_bauth')) {
+    $fields_token = array(
+        'conn_id' => array(
+            'type' => 'integer',
+            'length' => 4,
+            'notnull' => true,
+        ),
+        'user_id' => array(
+            'type' => 'integer',
+            'length' => 8,
+            'notnull' => true
+        ),
+        'username' => array(
+            'type' => 'text',
+            'length' => 256,
+            'notnull' => true,
+            'default' => ''
+        ),
+        'password' => array(
+            'type' => 'text',
+            'length' => 256,
+            'notnull' => true,
+            'default' => ''
+        )
+    );
+    $ilDB->createTable("rep_robj_xcls_bauth", $fields_token);
+    $ilDB->addPrimaryKey("rep_robj_xcls_bauth", array("conn_id","user_id"));
+}
+?>
+<#8>
+<?php
+if ($ilDB->tableExists('rep_robj_xcls_data')) {
+    if ($ilDB->tableColumnExists('rep_robj_xcls_data', 'username')) {
+        $ilDB->dropTableColumn('rep_robj_xcls_data','username');
+    }
+    if ($ilDB->tableColumnExists('rep_robj_xcls_data', 'password')) {
+        $ilDB->dropTableColumn('rep_robj_xcls_data','password');
+    }
+}
+?>
+<#9>
+<?php
+if ($ilDB->tableExists('rep_robj_xcls_data')) {
+    if ($ilDB->tableColumnExists('rep_robj_xcls_data', 'base_uri')) {
+        $ilDB->dropTableColumn('rep_robj_xcls_data','base_uri');
+    }
+}
+?>

@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 /* Copyright (c) 1998-2010 ILIAS open source, Extended GPL, see docs/LICENSE */
 
 /**
@@ -85,23 +88,29 @@ class ilCloudStorageFileTree
         return $this->root_node;
     }
 
-    protected function createNode(string $path, string $id, bool $is_dir = false): ilCloudStorageFileNode
+    protected function createNode(string $path, int $id, bool $is_dir = false): ilCloudStorageFileNode
     {
+        global $DIC;
         $path = (empty($path)) ? "/" : $path;
-        $node = new ilCloudStorageFileNode(ilCloudStorageUtil::normalizePath($path), $id);
+        $path = ilCloudStorageUtil::normalizePath($path);
+        $node = new ilCloudStorageFileNode($path, $id);
         $this->item_list[$node->getPath()] = $node;
         $this->id_to_path_map[$node->getId()] = $node->getPath();
         $node->setIsDir($is_dir);
         return $node;
     }
 
-    public function addNode(string $path, string $id, bool $is_Dir, int $modified = 0, $size = 0): ilCloudStorageFileNode
+    public function addNode(string $path, int $id, bool $is_Dir, int $modified = 0, $size = 0): ilCloudStorageFileNode
     {
+        global $DIC;
         $path = ilCloudStorageUtil::normalizePath($path);
         $node = $this->getNodeFromPath($path);
 
         //node does not yet exist
         if (!$node) {
+            if ($id == ilCloudStorageFileNode::ID_UNKNOWN) {
+                $id = $this->getUniqueId();
+            }
             if ($this->getNodeFromId($id)) {
                 throw new ilCloudStorageException(ilCloudStorageException::ID_ALREADY_EXISTS_IN_FILE_TREE_IN_SESSION);
             }
@@ -119,7 +128,7 @@ class ilCloudStorageFileTree
         return $node;
     }
 
-    public function addIdBasedNode(string $path, string $id, string $parent_id, bool $is_Dir, int $modified = null, $size = 0): ilCloudStorageFileNode
+    public function addIdBasedNode(string $path, int $id, int $parent_id, bool $is_Dir, int $modified = null, $size = 0): ilCloudStorageFileNode
     {
         $path = ilCloudStorageUtil::normalizePath($path);
         $node = $this->getNodeFromPath($path);
@@ -185,10 +194,10 @@ class ilCloudStorageFileTree
     }
 
     /**
-     * @param $id
+     * @param int $id
      * @return bool|ilCloudStorageFileNode
      */
-    public function getNodeFromId($id)
+    public function getNodeFromId(int $id)
     {
         if (!array_key_exists($id, $this->id_to_path_map)) {
             return false;
@@ -205,7 +214,7 @@ class ilCloudStorageFileTree
      * @param $path
      * @throws ilCloudStorageException
      */
-    public function setLoadingOfFolderComplete($path)
+    public function setLoadingOfFolderComplete(string $path)
     {
         $node = $this->getNodeFromPath($path);
         if (!$node) {
@@ -217,7 +226,7 @@ class ilCloudStorageFileTree
     /**
      * @param $current_path
      */
-    public function updateFileTree($current_path)
+    public function updateFileTree(string $current_path)
     {
         $node = $this->getNodeFromPath($current_path);
 
@@ -235,15 +244,15 @@ class ilCloudStorageFileTree
         $this->storeFileTreeToSession();
     }
 
-    public function addItemsFromService($folder_id)
+    public function addItemsFromService(int $folder_id)
     {
         try {
             $node = $this->getNodeFromId($folder_id);
             if (!$node) {
-                throw new ilCloudStorageException(ilCloudStorageException::ID_DOES_NOT_EXIST_IN_FILE_TREE_IN_SESSION, $folder_id);
+                throw new ilCloudStorageException(ilCloudStorageException::ID_DOES_NOT_EXIST_IN_FILE_TREE_IN_SESSION, (string) $folder_id);
             }
             $service = ilCloudStorageConfig::getServiceFromConfig($this->refId, $this->connId);
-            assert($service instanceof ilCloudStorageServiceInterface);
+            assert($service instanceof ilCloudStorageGenericService);
             $service->addToFileTree($this, $node->getPath());
         } catch (Exception $e) {
             if ($e instanceof ilCloudStorageException) {
@@ -269,7 +278,7 @@ class ilCloudStorageFileTree
      * @return bool|ilCloudStorageFileNode|null
      * @throws ilCloudStorageException
      */
-    public function addFolderToService(string $id, string $folder_name)
+    public function addFolderToService(int $id, string $folder_name)
     {
 
         try {
@@ -292,7 +301,7 @@ class ilCloudStorageFileTree
             $this->storeFileTreeToSession();
 
             $service = ilCloudStorageConfig::getServiceFromConfig($this->refId, $this->connId);
-            assert($service instanceof ilCloudStorageServiceInterface);
+            assert($service instanceof ilCloudStorageGenericService);
 
             $new_folder_id = $service->createFolderById($id, $folder_name);
             $new_node = null;
@@ -320,13 +329,9 @@ class ilCloudStorageFileTree
 
 
     /**
-     * @param $current_id
-     * @param $tmp_name
-     * @param $file_name
-     *
      * @throws ilCloudStorageException
      */
-    public function uploadFileToService(string $current_id, string $tmp_name, string $file_name): void
+    public function uploadFileToService(int $current_id, string $tmp_name, string $file_name): void
     {
         $max_file_size = ilFileUploadUtil::getMaxFileSize();
         if ($max_file_size >= filesize($tmp_name)) {
@@ -347,7 +352,7 @@ class ilCloudStorageFileTree
         }
     }
 
-    public function deleteFromService(string $id): void
+    public function deleteFromService(int $id): void
     {
         $item_node = $this->getNodeFromId($id);
 
@@ -372,7 +377,7 @@ class ilCloudStorageFileTree
      * @param $id
      * @throws ilCloudStorageException
      */
-    public function downloadFromService(string $id): void
+    public function downloadFromService(int $id): void
     {
         try {
             $service = ilCloudStorageConfig::getServiceFromConfig($this->refId, $this->connId);
@@ -391,7 +396,7 @@ class ilCloudStorageFileTree
     public function storeFileTreeToSession(): void
     {
         $_SESSION['ilCloudStorageFileTree_' . $this->refId] = null;
-        $_SESSION['ilCloudStorageFileTree_' . $this->refId] = serialize($this);
+        $_SESSION['ilCloudStorageFileTree_' . $this->refId] = base64_encode(serialize($this));
     }
 
     /**
@@ -400,7 +405,7 @@ class ilCloudStorageFileTree
     public static function getFileTreeFromSession(int $refId): ?ilCloudStorageFileTree
     {
         if (isset($_SESSION['ilCloudStorageFileTree_' . $refId])) {
-            return unserialize($_SESSION['ilCloudStorageFileTree_' . $refId]);
+            return unserialize(base64_decode($_SESSION['ilCloudStorageFileTree_' . $refId]));
         } else {
             return null;
         }
@@ -442,5 +447,9 @@ class ilCloudStorageFileTree
             $list[$node->getId()] = $node->getJSONEncode();
         }
         return $list;
+    }
+
+    public function getUniqueId() {
+        return count($this->id_to_path_map);
     }
 }

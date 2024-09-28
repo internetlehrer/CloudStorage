@@ -4,40 +4,32 @@
 
 Dieses [ILIAS](https://www.ilias.de) Plugin ermöglicht die Einbindung von Cloud-Ordnern verschiedener Cloud-Storage Services. 
 
-In der aktuellen Version wird der Cloud-Storage Service [ownCloud] (https://owncloud.com/de/) unterstützt.
+In der aktuellen Version werden die Cloud-Storage Services [ownCloud] (https://owncloud.com/de/) und [WebDAV] unterstützt.
 
 Weitere Services wie bspw. NextCloud sind in Planung.
 
-Das Plugin übernimmt mit einer umfassenden Überarbeitung die Features des für ILIAS 8 abgekündigten [OwnCloud Plugins] (https://github.com/fluxapps/OwnCloud) und ermöglicht die nahtlose Migration der Cloud-Ordner aus ILIAS 7.
+Es lassen sich nun auch verschiedene Cloud-Anbindungen des gleichen Typs konfigurieren wie bspw. [sciebo] (https://hochschulcloud.nrw/) und parallel Services, die ebenfalls auf ownCloud basieren oder einen Zugriff via WebDAV ermöglichen.
 
-Darüberhinaus lassen sich nun auch verschiedene Cloud-Anbindungen des gleichen Typs konfigurieren wie bspw [sciebo] (https://hochschulcloud.nrw/) und parallel Services, die ebenfalls auf ownCloud basieren.
-
-Für die ILIAS-Version 8 nutzen Sie bitte den branch 'release_8' (https://github.com/internetlehrer/CloudStorage/tree/release_8).
+Für die ILIAS-Version 9 nutzen Sie bitte den branch 'release_9' (https://github.com/internetlehrer/CloudStorage/tree/release_9).
 
 ## Features
 
-- migrieren Sie nahtlos ownCloud-Ordner und die Verbindungseinstellungen aus ILIAS 7
-- erzeugen Sie Cloud-Ordner in ILIAS, verknüpfen diese mit Basisordnern Ihres Cloud-Service Accounts.
-- bestimmen Sie, welche Nutzer in Kursen und Gruppen wie auf Inhalte des Cloud-Ordners zugreifen können.
+- Binden Sie Cloud-Services an ILIAS an, die auf ownCloud oder WebDAV basieren.
+- Erzeugen Sie Cloud-Ordner in ILIAS, verknüpfen diese mit Basisordnern Ihres Cloud-Service Accounts.
+- Bestimmen Sie, welche Nutzenden in Kursen und Gruppen wie auf Inhalte des Cloud-Ordners zugreifen können.
 
 ## Hinweise
 
-- Wenn Sie das Plugin *ohne Migration* in ILIAS 8 installieren möchten, befolgen Sie die Schritte der INSTALL.md
-- Wenn Sie das Plugin *mit Migration* der Cloud-Objekte aus ILIAS 7 installieren möchten, befolgen Sie die Schritte der MIGRATE.md
-  - Die Redirect-URL ändert sich mit diesem Plugin.
-  - Die Permanentlinks zu den migrierten-Objekten, die in ILIAS 7 kopiert wurden, funktionieren nicht mehr. Es muss eine Weiterleitung eingerichtet werden, wenn benötigt (siehe MIGRATE.md)
-
-## Inhaltsverzeichnis
-
-[TOC]
+- Cloud-Ordner aus ILIAS 7 wurden mit ILIAS 8 zum CloudStorage Plugin migriert. Für das Update von ILIAS 8 zu ILIAS 9 ist keine Migration vorgesehen. Wenn Sie von ILIAS 7 zu ILIAS 9 wechseln möchten, ist also die Migration in ILIAS 8 als Zwischenschritt notwendig.
+- Informationen zur Installation des Plugins finden Sie in der INSTALL.md
 
 ## Voraussetzungen
 
 Die Mindestvoraussetzungen, mit denen das Plugin getestet wurde, finden Sie hier im Überblick:
 
-- ILIAS 8.x
-- PHP 7.4, 8.0.x
-- MySQL 5.7 oder MariaDB 10.2
+- ILIAS 9.x
+- PHP 8.2.x
+- MySQL 5.7 oder MariaDB 10.8
 - OAuth2 Credentials des Cloud-Anbieters
 
 Des Weiteren benötigen Sie eine funktionsfähige Installation des gewünschten ownCloud-Services bzw. ein Kundenkonto des ownCloud-Service Anbieters.
@@ -53,3 +45,9 @@ Die Icons befinden sich in : `templates/images/*` und können durch eigene Icons
 - Datei-Symbol: `icon_dcl_file.svg`
 
 Wenn Sie einen eigenen Skin verwenden, können die Icons in den Image-Ordner des Skins gelegt werden, statt im Plugin-Ordner angepasst zu werden.
+
+## Dokumentation von Bugs und Feature-Vorschlägen
+
+Wenn Sie **Probleme bei der Installation oder der Verwendung** dieses Plugins haben, melden Sie diese bitte im Mantis der ILIAS-Community unter https://mantis.ilias.de/. Wählen Sie oben rechts "ILIAS Plugins" aus und erstellen Sie einen Report in der Kategorie "CloudStorage".
+
+Wenn Sie **Vorschläge für Verbesserungen oder für neue Funktionen** haben, dokumentieren Sie diese gerne hier im github-Repository als issue.

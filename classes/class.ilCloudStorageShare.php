@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * Class ilCloudStorageOwnCloudShare
+ * Class ilCloudStorageShare
  *
  * @author Theodor Truffer <tt@studer-raimann.ch>
  */
-class ilCloudStorageOwnCloudShare
+class ilCloudStorageShare
 {
 
     /**
@@ -113,9 +115,9 @@ class ilCloudStorageOwnCloudShare
     /**
      * @param stdClass $std_class
      *
-     * @return ilCloudStorageOwnCloudShare
+     * @return ilCloudStorageShare
      */
-    public static function loadFromStdClass(stdClass $std_class) : ilCloudStorageOwnCloudShare
+    public static function loadFromStdClass(stdClass $std_class) : ilCloudStorageShare
     {
         return self::loadFromArray((array) $std_class);
     }
@@ -124,9 +126,9 @@ class ilCloudStorageOwnCloudShare
     /**
      * @param array $array
      *
-     * @return ilCloudStorageOwnCloudShare
+     * @return ilCloudStorageShare
      */
-    public static function loadFromArray(array $array) : ilCloudStorageOwnCloudShare
+    public static function loadFromArray(array $array) : ilCloudStorageShare
     {
         $new = new self();
         foreach ($array as $key => $value) {
@@ -179,7 +181,8 @@ class ilCloudStorageOwnCloudShare
      */
     public function hasPermission(int $permission) : bool
     {
-    	return $this->permissions & $permission;
+        // ToDo: check if this is correct: https://www.php.net/manual/de/language.operators.bitwise.php
+    	return ($this->permissions & $permission) == true;
     }
 
     /**

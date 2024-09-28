@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 /* Copyright (c) 1998-2010 ILIAS open source, Extended GPL, see docs/LICENSE */
 
 /**
@@ -11,6 +14,8 @@
  */
 class ilCloudStorageFileNode
 {
+
+    const ID_UNKNOWN = -999999;
 
     protected int $id = 0;
     
@@ -34,7 +39,7 @@ class ilCloudStorageFileNode
     
     protected $mixed;
 
-    public function __construct(string $path, string $id)
+    public function __construct(string $path, int $id)
     {
         $this->setPath($path);
         $this->setId($id);

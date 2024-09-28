@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 /* Copyright (c) 1998-2010 ILIAS open source, Extended GPL, see docs/LICENSE */
 
 /**
@@ -47,7 +50,7 @@ class ilCloudStorageItemCreationListGUI
             $img1 = ilUtil::img($icon_path);
             $a_ttip1 = $lng->txt('rep_robj_xcls_cld_info_add_folder_to_current_directory');
             $this->gl->addEntry($img1 . ' '
-                . $lng->txt('rep_robj_xcls_cld_add_folder'), '#', '_top', 'javascript:il.CloudFileList.createFolder();', '', 'il_cld_add_file', $a_ttip1, 'bottom center', 'top center', false);
+                . $lng->txt('rep_robj_xcls_cld_add_folder'), '#', '_top', 'javascript:il.CloudFileList.createFolder();', '', 'il_cld_add_folder', $a_ttip1, 'bottom center', 'top center', false);
         }
 
         return $this->gl;

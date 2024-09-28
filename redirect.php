@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-chdir('../../../../../../../../../');
+chdir('../../../../../../../');
 
 require_once('./Services/Init/classes/class.ilInitialisation.php');
 ilInitialisation::initILIAS();

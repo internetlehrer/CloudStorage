@@ -27,8 +27,17 @@
   float: left;
   padding-top: 4px;
   padding-left: 10px;
+  padding-right: 10px;
   min-width: 300px;
 }
 #xcld_toolbar {
   white-space: inherit;
+}
+
+a.il_ContainerItemTitle, h3.il_ContainerItemTitle > span, ol.breadcrumb > li > a {
+  white-space: nowrap;
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 64ch;
 }

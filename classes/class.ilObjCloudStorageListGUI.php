@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 //include_once "./Services/Repository/classes/class.ilObjectPluginListGUI.php";
 
 /**

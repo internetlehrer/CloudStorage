@@ -1,0 +1,18 @@
+{
+  "require": {
+    "league/oauth2-client": "^2.4",
+    "php": ">=7.4"
+  },
+  "autoload": {
+    "classmap": [
+      "./classes/",
+      "./classes/OwnCloud/"
+    ]
+  },
+  "replace": {
+    "psr/http-message": "*",
+    "guzzlehttp/guzzle": "*",
+    "psr/http-client": "*",
+    "psr/http-factory": "*"
+  }
+}

@@ -6,7 +6,6 @@ $ti = new ilTextInputGUI($pl->txt("server_url"), "server_url");
 $ti->setRequired(true);
 $ti->setMaxLength(1024);
 $ti->setSize(60);
-$ti->setInfo($pl->txt("server_url_info"));
 $this->form->addItem($ti);
 
 /*
@@ -34,7 +33,7 @@ $ti = new ilTextInputGUI($pl->txt("webdav_path"), "webdav_path");
 $ti->setRequired(true);
 $ti->setMaxLength(255);
 $ti->setSize(60);
-$ti->setInfo(ilCloudStorageOwnCloud::getDefaultWebDavPath());
+//$ti->setInfo(ilCloudStorageWebDav::getDefaultWebDavPath());
 $this->form->addItem($ti);
 
 $ti = new ilTextInputGUI($pl->txt("base_directory"), "base_directory");
@@ -106,7 +105,7 @@ $ti = new ilTextInputGUI($pl->txt("oa2_path"), "oa2_path");
 $ti->setRequired(true);
 $ti->setMaxLength(1024);
 $ti->setSize(60);
-$ti->setInfo(ilCloudStorageOwnCloud::getDefaultOAuth2Path());
+$ti->setInfo(ilCloudStorageWebDav::getDefaultOAuth2Path());
 $ro->addSubItem($ti);
 
 $si = new ilSelectInputGUI($this->plugin_object->txt('oa2_token_request_auth'), 'oa2_token_request_auth');

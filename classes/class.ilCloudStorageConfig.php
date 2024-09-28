@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use ILIAS\DI\Container;
 
 /**
@@ -16,12 +18,14 @@ class ilCloudStorageConfig
     
     #region PROPERTIES
     public const PLUGIN_ID = 'xcls';
+
     public const AVAILABLE_FS_CONN = [
         'ocld'		=> 'OwnCloud',
-        'ncld'      => 'NextCloud'
+        'dav'       => 'WebDav'
     ];
     public const AVAILABLE_XCLS_SERVICES = [
-        'ocld'     => 'ilCloudStorageOwnCloud'
+        'ocld'     => 'ilCloudStorageOwnCloud',
+        'dav'      => 'ilCloudStorageWebDav'
     ];
     
     public const AVAILABILITY_NONE = 0;  // Type is not longer available (error message)
@@ -29,6 +33,10 @@ class ilCloudStorageConfig
     public const AVAILABILITY_CREATE = 2;  // New objects of this type can be created
 
     public const FS_RELATED_FUNCTION = [];
+
+    public const AUTH_METHOD_BASIC = 'basic';
+    public const AUTH_METHOD_OAUTH2 = 'oauth2';
+    public const AUTH_METHOD_OICD = 'oicd';
 
     private Container $dic;
     private ilDBInterface $db;
@@ -50,7 +58,6 @@ class ilCloudStorageConfig
     #'xls,xlsx,doc,docx,dot,dotx,odt,ott,rtf,txt,pdf,pdfa,html,epub,xps,djvu,djv,ppt,pptx';
     private string $collaborationAppMappingField = 'login';
     private string $collaborationAppUrl = '';
-    private bool $oauth2Active = true;
     private string $oauth2ClientId = '';
     private string $oauth2ClientSecret = '';
     private string $oauth2Path = '';
@@ -131,7 +138,6 @@ class ilCloudStorageConfig
             'col_app_formats'          => ['text', $this->getCollaborationAppFormats()],
             'col_app_mapping_field'    => ['text', $this->getCollaborationAppMappingField()],
             'col_app_url'              => ['text', $this->getCollaborationAppUrl()],
-            'oa2_active'                => ['integer', $this->ilBoolToInt($this->getOAuth2Active())],
             'oa2_client_id'             => ['text', $this->getOAuth2ClientId()],
             'oa2_client_secret'         => ['text', $this->getOAuth2ClientSecret()],
             'oa2_path'                  => ['text', $this->getOAuth2Path()],
@@ -175,7 +181,6 @@ class ilCloudStorageConfig
         $this->collaborationAppFormats = $this->getCollaborationAppFormats(true);
         $this->collaborationAppMappingField = 'login';
         $this->collaborationAppUrl = '';
-        $this->oauth2Active = false;
         $this->oauth2ClientId = '';
         $this->oauth2ClientSecret = '';
         $this->oauth2Path = $this->getOAuth2Path(true);
@@ -220,7 +225,6 @@ class ilCloudStorageConfig
             $this->setCollaborationAppFormats($record["col_app_formats"]);
             $this->setCollaborationAppMappingField($record["col_app_mapping_field"]);
             $this->setCollaborationAppUrl($record["col_app_url"]);
-            $this->setOAuth2Active($this->ilIntToBool($record["oa2_active"]));
             $this->setOauth2ClientId($record["oa2_client_id"]);
             $this->setOauth2ClientSecret($record["oa2_client_secret"]);
             $this->setOauth2Path($record["oa2_path"]);
@@ -371,18 +375,6 @@ class ilCloudStorageConfig
     public function setCollaborationAppUrl(string $collaborationAppUrl): void
     {
         $this->collaborationAppUrl = $collaborationAppUrl;
-    }
-
-    public function getOAuth2Active(): bool
-    {
-        return true;
-        //return $this->oauth2Active;
-    }
-
-    public function setOAuth2Active(bool $oauth2Active): void
-    {
-        $this->oauth2Active = true;
-        //$this->oauth2Active = $oauth2Active;
     }
 
     public function getOAuth2ClientId(): string
@@ -572,7 +564,7 @@ class ilCloudStorageConfig
 
     public function getTokenUser(?string $user = null)
     {
-        $array = json_decode($this->getAccessToken(), 1);
+        $array = json_decode($this->getAccessToken(), true);
         $token = !is_null($user) && isset($array[$user]) ? $array[$user] : null;
         return is_null($user) ? $array : $token;
     }
@@ -594,8 +586,7 @@ class ilCloudStorageConfig
         $this->authMethod = $authMethod;
     }
 
-
-    public static function getServiceFromConfig(int $refId, int $connId): ilCloudStorageServiceInterface
+    public static function getServiceFromConfig(int $refId, int $connId): ilCloudStorageGenericService
     {
         $serviceId = ilCloudStorageConfig::getInstance($connId)->getServiceId();
         $serviceClass = ilCloudStorageConfig::AVAILABLE_XCLS_SERVICES[$serviceId];
@@ -604,11 +595,63 @@ class ilCloudStorageConfig
 
     #endregion GETTER & SETTER
 
-    public static function _getCloudStorageConnOverviewUses(): array
+    public static function _getCloudStorageConnOverviewUses(array $filter = []): array
     {
-        global $DIC; /** @var Container $DIC */
+        global $DIC;
         $ilDB = $DIC->database();
+        $filterArr = [];
+        $parentFilter = "";
+        foreach ($filter as $key => $value) {
+            switch ($key) {
+                case "connTitle":
+                    if ($value != "" && $value != "-1") {
+                        $filterArr[] = "rep_robj_xcls_data.conn_id={$value}";
+                    }
+                break;
+                case "showTrash":
+                    if (!$value) {
+                        $filterArr[] = "isnull(object_reference.deleted)";
+                    }
+                break;
+                case "auth_complete":
+                    if ($value == "1") {
+                        $filterArr[] = "rep_robj_xcls_data.auth_complete=1";
+                    }
+                    if ($value == "2") {
+                        $filterArr[] = "rep_robj_xcls_data.auth_complete=0";
+                    }
+                break;
+                case "parentTitle":
+                    if ($value != "") {
+                        $parentFilter = "AND object_data.title LIKE '" . $value . "%'";
+                    }
+                break;
+                case "xclsObjTitle":
+                    if ($value != "") {
+                        $filterArr[] = "object_data.title LIKE '" . $value ."%'";
+                    }
+                break;
+                case "isInTrash":
+                    if ($value == "1") {
+                        $filterArr[] = "rep_robj_xcls_data.is_online=1";
+                    }
+                    if ($value == "2") {
+                        $filterArr[] = "rep_robj_xcls_data.is_online=0";
+                    }
+                    if ($value == "3" && $filter['showTrash']) {
+                        $filterArr[] = "not isnull(object_reference.deleted)";
+                    }
+                break;
+                
+            }
+        }
 
+        if (count($filterArr) > 0) {
+            $queryFilter = "AND " . implode(" AND ", $filterArr);
+        } else {
+            $queryFilter = "";
+        }
+        
         // Get Conn Title
         $query = "SELECT id, title from rep_robj_xcls_conn";
         $result = $ilDB->query($query);
@@ -616,12 +659,14 @@ class ilCloudStorageConfig
         while($row = $ilDB->fetchAssoc($result)) {
             $data0[$row['id']] = $row;
         }
+
         // Get conn uses
-        $query = "select object_reference.ref_id xclsRefId, rep_robj_xcls_data.conn_id xclsConnId, rep_robj_xcls_data.id as xclsObjId," .
-                " object_data.title xclsObjTitle, not isnull(object_reference.deleted) as isInTrash, rep_robj_xcls_data.is_online
+        $query = "select object_reference.ref_id as xclsRefId, rep_robj_xcls_data.conn_id as xclsConnId, rep_robj_xcls_data.id as xclsObjId," .
+                " object_data.title xclsObjTitle, not isnull(object_reference.deleted) as isInTrash, rep_robj_xcls_data.is_online, rep_robj_xcls_data.auth_complete
                  FROM rep_robj_xcls_data, object_data, object_reference
                  WHERE object_data.obj_id=rep_robj_xcls_data.id
                  AND object_reference.obj_id=rep_robj_xcls_data.id
+                 {$queryFilter}
                  ORDER by conn_id, xclsObjTitle
                  ";
         $result = $ilDB->query($query);
@@ -630,25 +675,26 @@ class ilCloudStorageConfig
             $row['connTitle'] = $data0[$row['xclsConnId']]['title'];
             $data[$row['xclsRefId']] = $row;
         }
-
         // Get repo data to conn uses
         $query = "select tree.child, tree.parent parentRefId, object_data.title parentTitle
                  FROM tree, object_data, object_reference
                  WHERE object_data.obj_id=object_reference.obj_id
                  AND object_reference.ref_id = tree.parent
-                 AND " . $ilDB->in('tree.child', array_keys($data), false, 'integer'); # object_reference.ref_id in (272)
+                 {$parentFilter}
+                 AND " . $ilDB->in('tree.child', array_keys($data), false, 'integer');
         $result = $ilDB->query($query);
         $data2 = [];
         while($row = $ilDB->fetchAssoc($result)) {
             $data2[$row['child']] = $row;
         }
-
         // merge all together
         $returnArr = [];
-        foreach ($data as $refId => $row) {
-            $returnArr[] = array_merge($data[$refId], $data2[$refId]);
-        } // EOF foreach ($data as $datum)
 
+        foreach ($data as $refId => $row) {
+            if (isset($data2[$refId])) {
+                $returnArr[] = array_merge($data[$refId], $data2[$refId]);
+            }
+        }
         return $returnArr;
     }
 

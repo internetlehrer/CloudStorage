@@ -1,6 +1,6 @@
-# Installation *ohne Migration* von ownCloud-Ordnern aus ILIAS 7
+# Informationen zur Installation
 
-1. Führen Sie das Upgrade von ILIAS 7 auf ILIAS 8 aus oder Installieren Sie ILIAS 8.
+1. Führen Sie das Upgrade von ILIAS 8 auf ILIAS 9 aus oder Installieren Sie ILIAS 9.
 
 2. Kopieren Sie den Inhalt dieses Ordners oder Klonen Sie das Git Repository in folgendes Verzeichnis auf Ihrem Webserver: `<ILIAS_directory>/Customizing/global/plugins/Services/Repository/RepositoryObject/CloudStorage`
   - Wechseln Sie auf dem Filesystem Ihres Webservers ins ILIAS-Verzeichnis, dann:

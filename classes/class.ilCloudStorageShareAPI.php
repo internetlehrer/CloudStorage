@@ -1,14 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 
 /**
- * Class ilCloudStorageOwnCloudShareAPI
+ * Class ilCloudStorageShareAPI
  *
  * @author Theodor Truffer <tt@studer-raimann.ch>
  */
-class ilCloudStorageOwnCloudShareAPI
+class ilCloudStorageShareAPI
 {
 
     const URI_SHARE_API = 'ocs/v1.php/apps/files_sharing/api/v1/shares';
@@ -33,16 +35,16 @@ class ilCloudStorageOwnCloudShareAPI
      */
     protected $http_client;
 
-    public ?ilCloudStorageOwnCloud $owncl = null;
+    public ?ilCloudStorageGenericService $service = null;
 
-    public function __construct(Client $http_client, ilCloudStorageOwnCloud $a_owncl)
+    public function __construct(Client $http_client, ilCloudStorageGenericService $a_service)
     {
         $this->http_client = $http_client;
-        $this->owncl = $a_owncl;
+        $this->service = $a_service;
     }
 
     /**
-     * @return ilCloudStorageOwnCloudShare[]
+     * @return ilCloudStorageShare[]
      * @throws GuzzleException
      */
     public function all() : array
@@ -53,7 +55,7 @@ class ilCloudStorageOwnCloudShareAPI
         if ($decoded->ocs->meta->status === 'ok') {
             $shares = [];
             foreach ($decoded->ocs->data as $std_class) {
-                $shares[] = ilCloudStorageOwnCloudShare::loadFromStdClass($std_class);
+                $shares[] = ilCloudStorageShare::loadFromStdClass($std_class);
             }
         }
         return $shares;
@@ -62,7 +64,7 @@ class ilCloudStorageOwnCloudShareAPI
     /**
      * @param string $path
      *
-     * @return ilCloudStorageOwnCloudShares[]
+     * @return ilCloudStorageShares[]
      * @throws GuzzleException
      */
     public function getForPath(string $path) : array
@@ -77,7 +79,7 @@ class ilCloudStorageOwnCloudShareAPI
         if ($decoded->ocs->meta->status === 'ok') {
             $shares = [];
             foreach ($decoded->ocs->data as $std_class) {
-                $shares[] = ilCloudStorageOwnCloudShare::loadFromStdClass($std_class);
+                $shares[] = ilCloudStorageShare::loadFromStdClass($std_class);
             }
         }
         return $shares;
@@ -141,7 +143,7 @@ class ilCloudStorageOwnCloudShareAPI
     protected function getOptions($additional_options = [])
     {
         return array_merge([
-            'headers' => $this->owncl->getHeaders()
+            'headers' => $this->service->getHeaders()
         ], $additional_options);
     }
 }

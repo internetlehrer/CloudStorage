@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 /**
 * Access/Condition checking for CloudStorage object
 *
@@ -32,6 +35,9 @@ class ilObjCloudStorageAccess extends ilObjectPluginAccess
         }
         switch ($a_permission) {
             case "visible":
+                if (!ilObjCloudStorageAccess::checkConnAvailability($a_obj_id)) {
+                    return false;
+                }
                 if (!ilObjCloudStorageAccess::checkOnline($a_obj_id) && !$ilAccess->checkAccessOfUser($a_user_id, "write", "", $a_ref_id)) {
                     return false;
                 }
@@ -60,33 +66,11 @@ class ilObjCloudStorageAccess extends ilObjectPluginAccess
             $object = new ilObjCloudStorage($a_ref_id);
             $obj_ids = $object->getAllWithSameOwnerAndConnection();
             $service = ilCloudStorageConfig::getServiceFromConfig($a_ref_id, $object->getConnId());
-            assert($service instanceof ilCloudStorageServiceInterface);
-            if (!$service->checkAndRefreshAuthentication()) {
-                foreach ($obj_ids as $obj_id) {
-                    $ref_ids = ilObject::_getAllReferences($obj_id);
-                    foreach ($ref_ids as $ref_id) {
-                        self::$connection_check_cache[$ref_id] = self::$connection_status;
-                        $obj = new ilObjCloudStorage($ref_id);
-                        $obj->setAuthComplete(false);
-                        $obj->update();
-                    }
-                }
-            } else {
-                try {
-                    $service->checkConnection();
-                    foreach ($obj_ids as $obj_id) {
-                        $ref_ids = ilObject::_getAllReferences($obj_id);
-                        foreach ($ref_ids as $ref_id) {
-                            self::$connection_check_cache[$ref_id] = 0;
-                            $obj = new ilObjCloudStorage($ref_id);
-                            $obj->setAuthComplete(true);
-                            $obj->update();
-                        }
-                    }
-                } catch(ilCloudStorageException $e) {
-                    self::$connection_status = $e->getCode();
-                    // authorization failed even though auth_complete = true
-                    if ($object->getAuthComplete() && $e->getCode() == ilCloudStorageException::NOT_AUTHORIZED) {
+            $config = ilCloudStorageConfig::getInstance($object->getConnId());
+            assert($service instanceof ilCloudStorageGenericService);
+            switch ($config->getAuthMethod()) {
+                case ilCloudStorageConfig::AUTH_METHOD_OAUTH2:
+                    if (!ilCloudStorageOAuth2::checkAndRefreshAuthentication($object->getOwnerId(), $config)) {
                         foreach ($obj_ids as $obj_id) {
                             $ref_ids = ilObject::_getAllReferences($obj_id);
                             foreach ($ref_ids as $ref_id) {
@@ -97,15 +81,80 @@ class ilObjCloudStorageAccess extends ilObjectPluginAccess
                             }
                         }
                     } else {
-                        foreach ($obj_ids as $obj_id) {
-                            $ref_ids = ilObject::_getAllReferences($obj_id);
-                            foreach ($ref_ids as $ref_id) {
-                                self::$connection_check_cache[$ref_id] = self::$connection_status;
+                        try {
+                            $service->checkConnection();
+                            foreach ($obj_ids as $obj_id) {
+                                $ref_ids = ilObject::_getAllReferences($obj_id);
+                                foreach ($ref_ids as $ref_id) {
+                                    self::$connection_check_cache[$ref_id] = 0;
+                                    $obj = new ilObjCloudStorage($ref_id);
+                                    $obj->setAuthComplete(true);
+                                    $obj->update();
+                                }
+                            }
+                        } catch(ilCloudStorageException $e) {
+                            self::$connection_status = $e->getCode();
+                            // authorization failed even though auth_complete = true
+                            if ($object->getAuthComplete() && $e->getCode() == ilCloudStorageException::NOT_AUTHORIZED) {
+                                foreach ($obj_ids as $obj_id) {
+                                    $ref_ids = ilObject::_getAllReferences($obj_id);
+                                    foreach ($ref_ids as $ref_id) {
+                                        self::$connection_check_cache[$ref_id] = self::$connection_status;
+                                        $obj = new ilObjCloudStorage($ref_id);
+                                        $obj->setAuthComplete(false);
+                                        $obj->update();
+                                    }
+                                }
+                            } else {
+                                foreach ($obj_ids as $obj_id) {
+                                    $ref_ids = ilObject::_getAllReferences($obj_id);
+                                    foreach ($ref_ids as $ref_id) {
+                                        self::$connection_check_cache[$ref_id] = self::$connection_status;
+                                    }
+                                }
                             }
                         }
                     }
-                }
+                    break;
+                case $config::AUTH_METHOD_BASIC:
+                    try {
+                        $service->checkConnection();
+                        foreach ($obj_ids as $obj_id) {
+                            $ref_ids = ilObject::_getAllReferences($obj_id);
+                            foreach ($ref_ids as $ref_id) {
+                                self::$connection_check_cache[$ref_id] = 0;
+                                $obj = new ilObjCloudStorage($ref_id);
+                                $obj->setAuthComplete(true);
+                                $obj->update();
+                            }
+                        }
+                    } catch(ilCloudStorageException $e) {
+                        self::$connection_status = $e->getCode();
+                        // authorization failed even though auth_complete = true
+                        if ($object->getAuthComplete() && $e->getCode() == ilCloudStorageException::NOT_AUTHORIZED) {
+                            foreach ($obj_ids as $obj_id) {
+                                $ref_ids = ilObject::_getAllReferences($obj_id);
+                                foreach ($ref_ids as $ref_id) {
+                                    self::$connection_check_cache[$ref_id] = self::$connection_status;
+                                    $obj = new ilObjCloudStorage($ref_id);
+                                    $obj->setAuthComplete(false);
+                                    $obj->update();
+                                }
+                            }
+                        } else {
+                            foreach ($obj_ids as $obj_id) {
+                                $ref_ids = ilObject::_getAllReferences($obj_id);
+                                foreach ($ref_ids as $ref_id) {
+                                    self::$connection_check_cache[$ref_id] = self::$connection_status;
+                                }
+                            }
+                        }
+                    }
+                    break;
+                default: 
+                    //ToDo
             }
+            
         }
     }
 
@@ -114,12 +163,16 @@ class ilObjCloudStorageAccess extends ilObjectPluginAccess
         global $DIC;
         $ilDB = $DIC->database();
 
+        try {
         $set = $ilDB->query(
             "SELECT is_online FROM rep_robj_xcls_data " .
             " WHERE id = " . $ilDB->quote($a_id, "integer")
         );
         $rec = $ilDB->fetchAssoc($set);
         return (bool) $rec["is_online"];
+        } catch(Exception $e) {
+            return false;
+        }
     }
 
     public static function checkConnAvailability(int $obj_id): bool
@@ -127,26 +180,31 @@ class ilObjCloudStorageAccess extends ilObjectPluginAccess
         global $DIC;
         $ilDB = $DIC->database();
 
-        $set = $ilDB->query(
-            "SELECT conn_id FROM rep_robj_xcls_data  " .
-            " WHERE id = " . $ilDB->quote($obj_id, "integer")
-        );
-        $data = $ilDB->fetchObject($set);
-
-        $set = $ilDB->query(
-            "SELECT availability FROM rep_robj_xcls_conn " .
-            " WHERE id = " . $ilDB->quote($data->conn_id, "integer")
-        );
-        $conn  = $ilDB->fetchObject($set);
-        //var_dump([(int)ilCloudStorageConfig::AVAILABILITY_NONE !== (int)$conn->availability, (int)$conn->availability]); exit;
-        return (int)ilCloudStorageConfig::AVAILABILITY_NONE !== (int)$conn->availability;
+        try {
+            $set = $ilDB->query(
+                "SELECT conn_id FROM rep_robj_xcls_data  " .
+                " WHERE id = " . $ilDB->quote($obj_id, "integer")
+            );
+            $data = $ilDB->fetchObject($set);
+            
+            
+            $set = $ilDB->query(
+                "SELECT availability FROM rep_robj_xcls_conn " .
+                " WHERE id = " . $ilDB->quote($data->conn_id, "integer")
+            );
+            $conn  = $ilDB->fetchObject($set);
+            //var_dump([(int)ilCloudStorageConfig::AVAILABILITY_NONE !== (int)$conn->availability, (int)$conn->availability]); exit;
+            return (int)ilCloudStorageConfig::AVAILABILITY_NONE !== (int)$conn->availability;
+        } catch (Exception $e) {
+            return false;
+        }
     }
 
     public static function checkAuthStatus(int $a_id): bool
     {
         global $DIC;
         $ilDB = $DIC['ilDB'];
-
+        try {
         if (!isset(self::$access_cache[$a_id]["auth_status"])) {
             $set = $ilDB->query("SELECT auth_complete FROM rep_robj_xcls_data " . " WHERE id = " . $ilDB->quote($a_id, "integer"));
             $rec = $ilDB->fetchAssoc($set);
@@ -154,6 +212,25 @@ class ilObjCloudStorageAccess extends ilObjectPluginAccess
         }
 
         return self::$access_cache[$a_id]["auth_status"];
+        } catch(Exception $e) {
+            return false;
+        }
+    }
+
+    public static function hasAccount(int $connId, int $userId): bool {
+        $config = ilCloudStorageConfig::getInstance($connId);
+        $ret = false;
+        switch ($config->getAuthMethod()) {
+            case ilCloudStorageConfig::AUTH_METHOD_OAUTH2:
+                $account = ilCloudStorageOAuth2::getUserToken($connId, $userId);
+                $ret = ($account->getAccessToken() != '') ? true : false;
+                break;
+            case ilCloudStorageConfig::AUTH_METHOD_BASIC:
+                $account = ilCloudStorageBasicAuth::getUserAccount($connId, $userId);
+                $ret = ($account->getUsername() != '') ? true : false;
+                break;
+        }
+        return $ret;
     }
 
 }

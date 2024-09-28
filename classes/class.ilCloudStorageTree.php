@@ -1,31 +1,32 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Class swdrTree
  *
  * @author  Theodor Truffer <tt@studer-raimann.ch>
  */
 
-class ilCloudStorageOwnCloudTree
+class ilCloudStorageTree
 {    
-    public $client;
+    public ?ilCloudStorageGenericService $service;
 
-    function __construct(ilCloudStorageOwnCloudClient $client)
+    function __construct(ilCloudStorageGenericService $service)
     {
-        $this->client = $client;
+        $this->service = $service;
     }
 
     public function getChilds($id, string $a_order = "", string $a_direction = "ASC"): array
     {
-        return $this->client->listFolder(ilCloudStorageUtil::decodeBase64Path($id));
+        return $this->service->listFolder(ilCloudStorageUtil::decodeBase64Path($id));
     }
 
     function getRootNode()
     {
-        $root = new ilCloudStorageOwnCloudFolder();
+        $root = new ilCloudStorageFolder();
         $root->setName('');
         $root->setPath('/');
-
         return $root;
     }
 }

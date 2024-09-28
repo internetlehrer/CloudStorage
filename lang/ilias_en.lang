@@ -8,6 +8,7 @@ obj_xcls_duplicate#:#Copy
 objs_xcls_duplicate#:#Copy Cloud Folder
 obj_xcls_select#:#Select Cloud Folder
 service_type_title#:#Cloud Type
+service_title#:#Cloud Service
 multifs#:#Cloud Folder
 xcls_multifs#:#Cloud Folder
 xcls_add#:#Add Cloud Folder
@@ -34,11 +35,18 @@ back#:#Back
 Cloudstorage#:#Content
 content#:#Content
 status#:#Status
+obj_status#:#Object Status
+auth_status#:#Authentication
 offline#:#Offline
 not_available#:#Not available
 no_connection
 no_active_conn#:#No Cloud Service available
 auth_failed#:#Authentication failed
+auth_login#:#Login
+login_to_service#:#Login to %s
+oauth2_login_info#:#After successful login a personal token will be saved in ILIAS for accessing the Cloud Service. Username and password will not be saved in ILIAS.
+auth_cancel#:#Cancel
+must_not_empty#:#field must not be empty
 plugin_migration#:#Migration of Cloud Folders from ILIAS 7
 migrate_old#:#Migrate Cloud Folders from ILIAS 7
 migrate_desc#:#There are still incompatible Cloud Folders from ILIAS 7 in the installation that need to be migrated.
@@ -57,17 +65,29 @@ col_app_mapping_field_info#:#Determines which field contains the OwnCloud login 
 plugin_configuration#:#Configuration
 config_help_begin#:#The explanation under settings is:
 showcontent#:#Cloud Connection
+repository_object#:#Repository Object
+show_trash#:#Show Trash Objects
+in_trash#:#In Trash
+purge#:#Delete from System
+purge_confirm#:#Delete Cloud-Folder from System? This is not recoverable!
 title#:#Title
 conf_title#:#Title
 info_title#:#This title is displayed to select the Cloud Service for new Folders.
 conf_availability#:#Availability
-info_availability#:#This is where you define whether and how this Cloud Connection can be used. "Not available" = Cloud Connection and Cloud Folder of this connection not available; "Existing allowed" = existing Cloud Folders of this connection allowed, connection cannot be selected for new Cloud Folders; "New ones can be created" = connection can be selected for new Cloud Folders 
+info_availability#:#This is where you define whether and how this Cloud Connection can be used.
 conf_availability_0#:#Not available
+conf_availability_info_0#:#Cloud Connection and Cloud Folder of this connection are not available
 conf_availability_1#:#Existing allowed
+conf_availability_info_1#:#existing Cloud Folders of this connection are allowed, connection cannot be selected for new Cloud Folders
 conf_availability_2#:#New ones can be created
+conf_availability_info_2#:#connection can be selected for new Cloud Folders
 untrashed_usages#:#Number of usages
+info_delete_folder#:#Delete Cloud Folder?
 saving_invoked#:#Settings saved
 create_type#:#Define new Cloud Connection
+select_type#:#Select Cloud Connection
+create_existing_folder#:#Select Cloud Folder
+add_type#:#Add new Cloud Connection
 delete_type#:#Delete Cloud Connection
 delete_conn#:#Delete Cloud Connection?
 conn_deleted#:#The Cloud Connection was deleted.
@@ -87,7 +107,9 @@ no_connection_short#:#A connection to the Cloud Service could not be established
 base_directory#:#Base directory
 base_directory_info#:#This directory is selected as the Base Folder for newly created objects. This is intended to prevent the entire OwnCloud from being integrated into new objects. However, the Base Folder can be customized later.
 hint#:#Hint text
-server_url#:#Server URLproxy_url#:#Proxy URL
+server_url#:#Server URL
+server_url_info#:#Example: http(s)://SERVER_HOST or if Server not accessible by default ports: http(s)://SERVER_HOST:8080
+proxy_url#:#Proxy URL
 proxy_url_info#:#The proxy URL is inserted from the ILIAS setup settings when a new Cloud Connection is created.
 webdav_url#:#WebDav server URL
 webdav_url_info#:#WebDav server URL if different from the server URL. This is the case, for example, if the Cloud Service is hosted in the same infrastructure and must be accessed via the internal address. Example: http://SERVER_HOST:8080
@@ -99,6 +121,11 @@ oa2_client_secret#:#Secret
 oa2_path#:#OAuth2 path
 oa2_token_request_auth#:#Token request authentication
 oa2_token_request_auth_info#:#Defines how token requests are authenticated (experimental - "Post Body" may be required for NextCloud).
+bauth_active#:#Basic-Authentication
+bauth_active_info#:#Username and password have to be specified at Cloud Folder creation.
+bauth_edit#:#Edit Authentication
+account_username#:#Username
+account_password#:#Password
 extended_networking#:#Extended Network Settings
 extended_networking_info#:#Only relevant in certain system configurations. Please contact technical support for more information.
 header#:#Basic (header)
@@ -106,9 +133,13 @@ post_body#:#Post Body
 default_info#:#Default: %s
 info_token_expires#:#Access Token expires
 root_folder#:#Folder
+authentication_required#:#Authentication required
+authentication#:#Authentication
 not_authorized#:#Authentication failed. Please reload the page to be redirected to the authentication authority.
+cloud_provider_not_online#:#Cloud Provider not available. Please contact technical support for more information.
+successful_authenticated#:#Authentication successful
 only_owner#:#Only the person who created the Cloud Folder can currently open it.
-open_in_ownCloud#:#Open in external editor
+open_in_platform#:#Open in external editor
 cld_add#:#New Cloud Folder
 cld_add_download_failed#:#Download failed
 cld_add_file#:#File
@@ -146,6 +177,10 @@ cld_new#:#Add new Cloud Folder
 cld_no_service_active#:#Unfortunately, no cloud plugin is activated
 cld_no_service_selected#:#No Cloud Service has been selected.
 cld_not_authenticated_offline#:#Not authenticated - offline
+not_authenticated#:#Not authenticated
+authenticated#:#Authenticated
+online#:#Online
+offline#:#Offline
 cld_object_added#:#A new Cloud Folder has been added
 cld_only_owner_has_permission_to_change_root_path#:#Only the person who created the Cloud Folder can change this specification.
 cld_path_does_not_exist_in_file_tree_in_session#:#Path does not exist in the session:
@@ -169,3 +204,11 @@ info_hint#:#The hint text is displayed in the info tab of the Cloud Folders.
 file_folder_not_visible#:#Permission denied.
 node_is_null#:#Ressource could not be found.
 please_wait#:#Please wait
+has_account#:#Your account is already linked to the Cloud Service. <br />Click "Select Cloud Folder".
+root_folder_name#:#Root
+new_folder_add_info#:#The new Cloud Folder will be created in %s
+rep_robj_xcls_grp_create_xcls#:#Create Cloud Folder
+rep_robj_xcls_crs_create_xcls#:#Create Cloud Folder
+rep_robj_xcls_fold_create_xcls#:#Create Cloud Folder
+rep_robj_xcls_cat_create_xcls#:#Create Cloud Folder
+rep_robj_xcls_root_create_xcls#:#Create Cloud Folder
