@@ -7,16 +7,17 @@
     ```
     mkdir -p Customizing/global/plugins/Services/Repository/RepositoryObject
     cd Customizing/global/plugins/Services/Repository/RepositoryObject
-    git clone https://github.com/internetlehrer/CloudStorage
+    git clone -b release_9 https://github.com/internetlehrer/CloudStorage.git
     ```
-  - Wechseln Sie ins Plugin-Unterverzeichnis `OwnCloud` und installieren Sie die composer Bibliotheken:
+  - Wechseln Sie ins Plugin-Verzeichnis und installieren Sie die composer Bibliotheken:
     ```
-    cd Customizing/global/plugins/Services/Repository/RepositoryObject/CloudStorage/classes/OwnCloud/
-    composer install
+    cd CloudStorage
+    composer install --no-dev
     ```
-3. Führen Sie im ILIAS Webroot-Verzeichnis composer dump-autoload aus:
+3. Führen Sie im ILIAS Webroot-Verzeichnis composer dump-autoload und das setup aus:
     ```
     composer du
+    php setup/setup.php update
     ```
 
 4. Melden Sie sich auf Ihrer ILIAS-Installation als Administrator an und wählen Sie im Menü `Administration / Plugins`. In der Plugin-Übersicht finden Sie den Eintrag CloudStorage. Führen Sie über dessen Dropdown-Menü folgende Aktionen aus:
