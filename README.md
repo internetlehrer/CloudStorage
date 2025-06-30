@@ -1,3 +1,7 @@
+# DEPRECATED
+
+Please use https://gitlab.com/eqsoft/CloudStorage
+
 # ILIAS CloudStorage-Plugin
 
 ## Über
